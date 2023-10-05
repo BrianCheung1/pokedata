@@ -4,7 +4,7 @@ import usePokemon from "@/hooks/usePokemon"
 import { PokemonCard } from "./PokemonCard"
 import { Autocomplete } from "@mantine/core"
 import useAllPokemons from "@/hooks/useAllPokemons"
-import { Container, Grid, Stack } from "@mantine/core"
+import { Container, Stack } from "@mantine/core"
 
 export const SearchBar = () => {
   const [searchTerm, setSearchTerm] = useState("")
