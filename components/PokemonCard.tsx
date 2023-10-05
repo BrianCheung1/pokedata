@@ -1,78 +1,74 @@
 import { capitalize } from "@/libs/utils"
+import { Card, Image, Text, Badge, Button, Group } from "@mantine/core"
+import { Skeleton } from "@mantine/core"
 
 interface PokemonCardProps {
   pokemon: Record<string, any>
+  isLoading: boolean
 }
 
-export const PokemonCard: React.FC<PokemonCardProps> = ({ pokemon }) => {
+export const PokemonCard: React.FC<PokemonCardProps> = ({
+  pokemon,
+  isLoading,
+}) => {
   const renderTypeEffectiveness = () => {
     const list = []
-    for (const key in pokemon?.type_effectiveness) {
-      if (key) list.push(<div>{`${key} Moves`}:</div>)
 
+    for (const key in pokemon?.type_effectiveness) {
+      if (key) list.push(<div>{`${capitalize(key)} Moves`}:</div>)
       for (const key2 in pokemon?.type_effectiveness[key]) {
         list.push(
-          <div>{`${pokemon?.type_effectiveness[key][key2]}x more dmg to ${key2}`}</div>
+          <div>{`Effective against ${pokemon?.type_effectiveness[key][key2]} types`}</div>
         )
       }
-      list.push(
-        <hr className="h-px my-4 bg-gray-200 border-0 dark:bg-gray-700"></hr>
-      )
     }
-    if (!list) {
-      return null
+    if (list.length <= 0) {
+      return "N/A"
     }
-
     return list
   }
 
   const renderTypeWeakness = () => {
-    const list = []
-    for (const key in pokemon?.type_weakness) {
-      if (key) list.push(<div>{`${key} Weakness`}:</div>)
+    return pokemon?.type_weakness?.join(", ")
+  }
 
-      for (const key2 in pokemon?.type_weakness[key]) {
-        list.push(
-          <div>{`${pokemon?.type_weakness[key][key2]}x less dmg to ${key2}`}</div>
-        )
-      }
+  const renderBadges = () => {
+    const list = []
+    for (const pokemon_types in pokemon?.pokemon_types) {
       list.push(
-        <hr className="h-px my-4 bg-gray-200 border-0 dark:bg-gray-700"></hr>
+        <Badge color="pink" variant="light">
+          {pokemon?.pokemon_types[pokemon_types]}
+        </Badge>
       )
     }
-    return pokemon?.type_weakness.join(", ")
-    if (!list) {
-      return null
-    }
-
     return list
   }
 
-  if (Object.keys(pokemon).length === 0) {
-    return null
-  }
-
   return (
-    <div className="flex w-auto p-8 md:flex-row flex-col rounded-lg justify-center items-center bg-[#3C6E71] shadow-[0_2px_15px_-3px_rgba(0,0,0,0.07),0_10px_20px_-2px_rgba(0,0,0,0.04)]">
-      <div>
-        <div className="flex justify-center items-center">
-          <img className="rounded-lg p-4" src={`${pokemon?.sprite}`} alt="" />
-        </div>
-        <div className="flex flex-col">
-          <div className="flex justify-center">
-            <h1 className="mb-2 text-2xl font-medium text-[#FFFFFF] dark:text-neutral-50">
-              {capitalize(pokemon?.pokemon_name)}
-            </h1>
-          </div>
-          <hr className="h-px my-4 bg-gray-200 border-0 dark:bg-gray-700"></hr>
-          <p className="text-base text-[#D9D9D9] ">
-            {pokemon?.pokemon_types && `${pokemon?.pokemon_types?.join(", ")}`}
-            <hr className="h-px my-4 bg-gray-200 border-0 dark:bg-gray-700"></hr>
-            {renderTypeEffectiveness()}
+    <Skeleton visible={isLoading}>
+      <Card shadow="sm" padding="lg" radius="md" withBorder>
+        <Card.Section>
+          <Image src={pokemon?.sprite ?  `${pokemon?.sprite}` : `/images/og-default-image.jpeg`} height={160} alt="Pokemon" />
+        </Card.Section>
+        <Group justify="space-between" mt="md" mb="xs">
+          <Text size="xl" fw={500}>
+            {capitalize(pokemon?.pokemon_name)}
+          </Text>
+          <Text>{renderBadges()}</Text>
+        </Group>
+        <hr className="h-px my-4 bg-gray-200 border-0 dark:bg-gray-700"></hr>
+        Strengths
+        <Text size="md" c="dimmed">
+          {renderTypeEffectiveness()}
+        </Text>
+        <hr className="h-px my-4 bg-gray-200 border-0 dark:bg-gray-700"></hr>
+        <Card.Section inheritPadding mt="sm" pb="md">
+          Weakness
+          <Text size="md" c="dimmed">
             {renderTypeWeakness()}
-          </p>
-        </div>
-      </div>
-    </div>
+          </Text>
+        </Card.Section>
+      </Card>
+    </Skeleton>
   )
 }

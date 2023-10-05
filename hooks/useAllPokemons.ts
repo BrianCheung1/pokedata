@@ -1,8 +1,8 @@
 import useSwr from 'swr'
 import fetcher from '@/libs/fetcher'
 
-const usePokemon = (pokemon_name: string) => {
-    const {data, error, isLoading} = useSwr(`/api/pokemons/pokemon/${pokemon_name}`, fetcher, {
+const useAllPokemons = () => {
+    const {data, error, isLoading} = useSwr(`/api/pokemons/`, fetcher, {
         revalidateIfStale: false,
         revalidateOnFocus: false,
         revalidateOnReconnect: false
@@ -13,4 +13,4 @@ const usePokemon = (pokemon_name: string) => {
     }
 }
 
-export default usePokemon
+export default useAllPokemons

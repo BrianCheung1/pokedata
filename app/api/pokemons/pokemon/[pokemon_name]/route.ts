@@ -1,11 +1,12 @@
 import { NextResponse } from "next/server"
 import axios from "axios"
+import { capitalize } from "@/libs/utils"
 
 export async function GET(
   req: Request,
   { params }: { params: { pokemon_name: string } }
 ) {
-  const pokemon_name = params.pokemon_name
+  const pokemon_name = params.pokemon_name.toLowerCase()
   try {
     const type_weakness_data = await findDualTypeDoubleDmgFrom(pokemon_name)
     const type_effectiveness_data = await findDualTypeDoubleDmgTo(pokemon_name)
@@ -39,7 +40,7 @@ async function getTypeDoubleDmgFrom(typeName: string) {
   const response = await axios.get(`https://pokeapi.co/api/v2/type/${typeName}`)
   // const data = await response.json()
   return response.data.damage_relations.double_damage_from.map(
-    (type: { name: any }) => type.name
+    (type: { name: any }) => capitalize(type.name)
   )
 }
 
@@ -47,7 +48,7 @@ async function getTypeHalfDmgFrom(typeName: string) {
   const response = await axios.get(`https://pokeapi.co/api/v2/type/${typeName}`)
   // const data = await response.json()
   return response.data.damage_relations.half_damage_from.map(
-    (type: { name: any }) => type.name
+    (type: { name: any }) => capitalize(type.name)
   )
 }
 
@@ -88,8 +89,9 @@ async function findDualTypeDoubleDmgFrom(pokemonName: string) {
       const dualTypeWeakness = [
         ...doubleDamageFrom1,
         ...doubleDamageFrom2,
-      ].filter((val) => 
-        !halfDamageFrom1.includes(val) && !halfDamageFrom2.includes(val)
+      ].filter(
+        (val) =>
+          !halfDamageFrom1.includes(val) && !halfDamageFrom2.includes(val)
       )
 
       return Array.from(new Set(dualTypeWeakness))
@@ -122,8 +124,13 @@ async function findDualTypeDoubleDmgTo(pokemonName: string) {
       return doubleDmgObject
     } else {
       const [type] = pokemonTypes
-      const effectivenessType = await getTypeDoubleDmgTo(type)
-      return effectivenessType
+      const doubleDmgTo1 = await getTypeDoubleDmgTo(type)
+
+      const doubleDmgObject = {
+        [type]: doubleDmgTo1,
+      }
+
+      return doubleDmgObject
     }
   } catch (error) {
     return NextResponse.json({ msg: error }, { status: 500 })

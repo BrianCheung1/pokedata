@@ -1,10 +1,12 @@
-"use client"
 import { SearchBar } from "@/components/SearchBar"
+import { ColorSchemeToggle } from "@/components/ColorSchemeToggle"
+import { Container } from "@mantine/core"
 
 export default function Home() {
   return (
-    <main className="flex flex-col items-center justify-between p-24 w-full h-full">
-        <SearchBar />
-    </main>
+    <Container fluid className="overflow-hidden">
+      <ColorSchemeToggle />
+      <SearchBar />
+    </Container>
   )
 }
