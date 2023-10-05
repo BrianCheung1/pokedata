@@ -4,8 +4,8 @@ import useTypes from "@/hooks/usePokemon"
 
 export default function Home() {
   return (
-    <main className="flex min-h-screen flex-col items-center justify-between p-24">
-      <div>
+    <main className="flex flex-col items-center justify-between p-24">
+      <div className="">
         <SearchBar />
       </div>
     </main>

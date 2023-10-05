@@ -15,7 +15,7 @@ export async function GET(
     const pokemon_id = types.data.find(
       (data: { pokemon_name: string }) =>
         data.pokemon_name.toLowerCase() === pokemon_name.toLowerCase()
-    ).id
+    ).pokemon_id
     const pokemon_types = types.data.find(
       (data: { pokemon_name: string }) =>
         data.pokemon_name.toLowerCase() === pokemon_name.toLowerCase()
@@ -48,6 +48,7 @@ export async function GET(
         msg: "Success",
         pokemon_types: pokemon_types,
         type_effectiveness: type_effectiveness_data,
+        sprite: `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/dream-world/${pokemon_id}.svg`,
       },
       { status: 200 }
     )
