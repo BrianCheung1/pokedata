@@ -7,14 +7,13 @@ import useAllPokemons from "@/hooks/useAllPokemons"
 import { Container, Stack } from "@mantine/core"
 
 export const SearchBar = () => {
-  const [searchTerm, setSearchTerm] = useState("")
   const [submittedTerm, setSubmittedTerm] = useState("")
   const { data: pokemon = [], isLoading } = usePokemon(submittedTerm)
   const { data: allPokemons = [], isLoading: isPokemonsLoading } =
     useAllPokemons()
 
-  const handleSubmit = () => {
-    setSubmittedTerm(searchTerm)
+  if (isPokemonsLoading) {
+    return null
   }
 
   return (
@@ -34,9 +33,6 @@ export const SearchBar = () => {
                 )
           }
           limit={5}
-          onChange={(value) => {
-            setSearchTerm(value)
-          }}
           onOptionSubmit={(value) => {
             setSubmittedTerm(value)
           }}

@@ -65,44 +65,43 @@ export const PokemonCard: React.FC<PokemonCardProps> = ({
   return (
     <Skeleton visible={isLoading}>
       <Card shadow="sm" padding="lg" radius="md" withBorder>
-        <Card.Section>
-          <Grid justify="center">
+        <Grid justify="center">
+          <Grid.Col span="content" className="text-center">
+            <Image
+              src={
+                pokemon?.sprite
+                  ? `${pokemon?.sprite}`
+                  : `/images/og-default-image.jpeg`
+              }
+              h={200}
+              fit="contain"
+              alt="Pokemon"
+            />
+            <Badge>Base</Badge>
+          </Grid.Col>
+
+          {pokemon?.shiny && (
             <Grid.Col span="content" className="text-center">
               <Image
                 src={
-                  pokemon?.sprite
-                    ? `${pokemon?.sprite}`
+                  pokemon?.sprite_shiny
+                    ? `${pokemon?.sprite_shiny}`
                     : `/images/og-default-image.jpeg`
                 }
                 h={200}
                 fit="contain"
                 alt="Pokemon"
               />
-              <Badge>Base</Badge>
+              <Badge color="#F7D02C">Shiny</Badge>
             </Grid.Col>
-
-            {pokemon?.shiny && (
-              <Grid.Col span="content" className="text-center">
-                <Image
-                  src={
-                    pokemon?.sprite_shiny
-                      ? `${pokemon?.sprite_shiny}`
-                      : `/images/og-default-image.jpeg`
-                  }
-                  h={200}
-                  fit="contain"
-                  alt="Pokemon"
-                />
-                <Badge color="#F7D02C">Shiny</Badge>
-              </Grid.Col>
-            )}
-          </Grid>
-        </Card.Section>
+          )}
+        </Grid>
         <Group justify="space-between" mt="md" mb="xs">
           <Text size="xl" fw={500}>
             {capitalize(pokemon?.pokemon_name)}
           </Text>
           <Group justify="space-between">{renderBadges()}</Group>
+          <Text size="xs">{pokemon?.pokemon_flavor_text}</Text>
         </Group>
         <hr className="h-px my-4 bg-gray-200 border-0 dark:bg-gray-700"></hr>
         <Grid className="text-center">
@@ -133,6 +132,17 @@ export const PokemonCard: React.FC<PokemonCardProps> = ({
         </Text>
         <Text size="md" c="dimmed">
           Found in Wild: {pokemon?.shiny?.found_wild ? "True" : "N/A"}
+        </Text>
+        <hr className="h-px my-4 bg-gray-200 border-0 dark:bg-gray-700"></hr>
+        Pokemon Stats
+        <Text size="md" c="dimmed">
+          Base Attack: {pokemon?.pokemon_stats?.base_attack}
+        </Text>
+        <Text size="md" c="dimmed">
+          Base Defense: {pokemon?.pokemon_stats?.base_defense}
+        </Text>
+        <Text size="md" c="dimmed">
+          Base Stamina: {pokemon?.pokemon_stats?.base_stamina}
         </Text>
       </Card>
     </Skeleton>

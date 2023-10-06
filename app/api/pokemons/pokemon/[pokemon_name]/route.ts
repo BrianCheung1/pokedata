@@ -13,6 +13,8 @@ export async function GET(
     const pokemon_details = await getPokemonDetails(pokemon_name)
     const pokemon_types = await getPokemonTypes(pokemon_details)
     const type_resistant = await findDualTypeHalfDmgFrom(pokemon_name)
+    const pokemon_stats = await getPokemonStats(pokemon_name)
+    const pokemon_flavor_text = await findFlavorText(pokemon_name)
     const shiny = await getShiny(pokemon_name)
     return NextResponse.json(
       {
@@ -23,6 +25,8 @@ export async function GET(
         type_vulnerable: type_vulnerable,
         type_resistant: type_resistant,
         shiny: shiny,
+        pokemon_stats: pokemon_stats,
+        pokemon_flavor_text: pokemon_flavor_text,
         sprite: `https://img.pokemondb.net/sprites/go/normal/${pokemon_name}.png`,
         sprite_shiny: `https://img.pokemondb.net/sprites/go/shiny/${pokemon_name}.png`,
       },
@@ -35,8 +39,15 @@ export async function GET(
 }
 
 async function getPokemonDetails(pokemonName: string) {
-  const response = await axios(
+  const response = await axios.get(
     `https://pokeapi.co/api/v2/pokemon/${pokemonName}`
+  )
+  return response.data
+}
+
+async function getFlavorTextEntries(pokemonName: string) {
+  const response = await axios.get(
+    `https://pokeapi.co/api/v2/pokemon-species/${pokemonName}`
   )
   return response.data
 }
@@ -83,6 +94,17 @@ async function getShiny(pokemon_name: string) {
   )
   const pokemon_details = await getPokemonDetails(pokemon_name)
   return response.data[Number(pokemon_details.id)]
+}
+
+async function getPokemonStats(pokemon_name: string) {
+  const response = await axios.get(
+    `https://pogoapi.net/api/v1/pokemon_stats.json`
+  )
+  return response.data.find(
+    (pokemon: { pokemon_name: string; form: string }) =>
+      pokemon.pokemon_name.toLowerCase() === pokemon_name &&
+      pokemon.form === "Normal"
+  )
 }
 
 async function findDualTypeDoubleDmgFrom(pokemonName: string) {
@@ -174,6 +196,19 @@ async function findDualTypeHalfDmgFrom(pokemonName: string) {
       const halfDamageFrom = await getTypeHalfDmgFrom(type)
       return halfDamageFrom
     }
+  } catch (error) {
+    return NextResponse.json({ msg: error }, { status: 500 })
+  }
+}
+
+async function findFlavorText(pokemonName: string) {
+  try {
+    const pokemonDetails = await getFlavorTextEntries(pokemonName)
+    const flavorText = pokemonDetails.flavor_text_entries.filter(
+      (languages: { language: { name: string } }) =>
+        languages.language.name === "en"
+    )
+    return flavorText.pop().flavor_text
   } catch (error) {
     return NextResponse.json({ msg: error }, { status: 500 })
   }
