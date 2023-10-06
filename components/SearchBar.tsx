@@ -22,13 +22,16 @@ export const SearchBar = () => {
       size="responsive"
       className="mt-5 flex items-center justify-center "
     >
-      <Stack className="w-56 md:w-96 ">
+      <Stack className="w-56 md:w-2/3 lg:w-1/2">
         <Autocomplete
+          className="flex items-center justify-center"
           placeholder="Search term..."
           data={
             isPokemonsLoading
               ? []
-              : allPokemons.pokemons.map((pokemon: { name: any }) => pokemon.name)
+              : allPokemons.pokemons.map(
+                  (pokemon: { name: any }) => pokemon.name
+                )
           }
           limit={5}
           onChange={(value) => {
@@ -38,7 +41,9 @@ export const SearchBar = () => {
             setSubmittedTerm(value)
           }}
         />
-          <PokemonCard pokemon={pokemon} isLoading={isLoading}/>
+        {submittedTerm && (
+          <PokemonCard pokemon={pokemon} isLoading={isLoading} />
+        )}
       </Stack>
     </Container>
   )

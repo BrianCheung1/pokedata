@@ -1,6 +1,7 @@
 import { capitalize } from "@/libs/utils"
 import { Card, Image, Text, Badge, Button, Group } from "@mantine/core"
-import { Skeleton } from "@mantine/core"
+import { Skeleton, Grid, SimpleGrid } from "@mantine/core"
+import { colors } from "@/libs/utils"
 
 interface PokemonCardProps {
   pokemon: Record<string, any>
@@ -22,21 +23,38 @@ export const PokemonCard: React.FC<PokemonCardProps> = ({
         )
       }
     }
-    if (list.length <= 0) {
-      return "N/A"
-    }
     return list
   }
 
-  const renderTypeWeakness = () => {
-    return pokemon?.type_weakness?.join(", ")
+  const renderTypeVulnerable = () => {
+    const list: any = []
+    pokemon?.type_vulnerable?.sort().forEach((element: string) => {
+      list.push(
+        <Badge className="mr-2" color={colors[element.toLowerCase()]}>
+          {element}
+        </Badge>
+      )
+    })
+    return list
+  }
+
+  const renderTypeResistances = () => {
+    const list: any = []
+    pokemon?.type_resistant?.sort().forEach((element: string) => {
+      list.push(
+        <Badge className="mr-2" color={colors[element.toLowerCase()]}>
+          {element}
+        </Badge>
+      )
+    })
+    return list
   }
 
   const renderBadges = () => {
     const list = []
     for (const pokemon_types in pokemon?.pokemon_types) {
       list.push(
-        <Badge color="pink" variant="light">
+        <Badge color={colors[pokemon.pokemon_types[pokemon_types]]}>
           {pokemon?.pokemon_types[pokemon_types]}
         </Badge>
       )
@@ -48,26 +66,74 @@ export const PokemonCard: React.FC<PokemonCardProps> = ({
     <Skeleton visible={isLoading}>
       <Card shadow="sm" padding="lg" radius="md" withBorder>
         <Card.Section>
-          <Image src={pokemon?.sprite ?  `${pokemon?.sprite}` : `/images/og-default-image.jpeg`} height={160} alt="Pokemon" />
+          <Grid justify="center">
+            <Grid.Col span="content" className="text-center">
+              <Image
+                src={
+                  pokemon?.sprite
+                    ? `${pokemon?.sprite}`
+                    : `/images/og-default-image.jpeg`
+                }
+                h={200}
+                fit="contain"
+                alt="Pokemon"
+              />
+              <Badge>Base</Badge>
+            </Grid.Col>
+
+            {pokemon?.shiny && (
+              <Grid.Col span="content" className="text-center">
+                <Image
+                  src={
+                    pokemon?.sprite_shiny
+                      ? `${pokemon?.sprite_shiny}`
+                      : `/images/og-default-image.jpeg`
+                  }
+                  h={200}
+                  fit="contain"
+                  alt="Pokemon"
+                />
+                <Badge color="#F7D02C">Shiny</Badge>
+              </Grid.Col>
+            )}
+          </Grid>
         </Card.Section>
         <Group justify="space-between" mt="md" mb="xs">
           <Text size="xl" fw={500}>
             {capitalize(pokemon?.pokemon_name)}
           </Text>
-          <Text>{renderBadges()}</Text>
+          <Group justify="space-between">{renderBadges()}</Group>
         </Group>
         <hr className="h-px my-4 bg-gray-200 border-0 dark:bg-gray-700"></hr>
-        Strengths
+        <Grid className="text-center">
+          <Grid.Col span={6}>
+            Resistant To
+            <Text size="md" c="dimmed">
+              {renderTypeResistances()}
+            </Text>
+          </Grid.Col>
+          <Grid.Col span={6}>
+            Vulnerable To
+            <Text size="md" c="dimmed">
+              {renderTypeVulnerable()}
+            </Text>
+          </Grid.Col>
+        </Grid>
+        <hr className="h-px my-4 bg-gray-200 border-0 dark:bg-gray-700"></hr>
         <Text size="md" c="dimmed">
           {renderTypeEffectiveness()}
         </Text>
         <hr className="h-px my-4 bg-gray-200 border-0 dark:bg-gray-700"></hr>
-        <Card.Section inheritPadding mt="sm" pb="md">
-          Weakness
-          <Text size="md" c="dimmed">
-            {renderTypeWeakness()}
-          </Text>
-        </Card.Section>
+        Shiny Rate
+        <Text size="md" c="dimmed">
+          Found in Egg: {pokemon?.shiny.found_egg ? "True" : "N/A"}
+        </Text>
+        <Text size="md" c="dimmed">
+          Found in Research: {pokemon?.shiny.found_research ? "True" : "N/A"}
+        </Text>
+        <Text size="md" c="dimmed">
+          Found in Wild: {pokemon?.shiny.found_wild ? "True" : "N/A"}
+        </Text>
       </Card>
     </Skeleton>
   )
