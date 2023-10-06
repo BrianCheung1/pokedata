@@ -8,15 +8,15 @@ export function ColorSchemeToggle() {
   return (
     <Group justify="center" mt="sm">
       <Button
-        variant="outline"
-        color="rgba(0, 0, 0, 1)"
+        variant="filled"
+        color="rgba(4, 0, 255, 1)"
         onClick={() => setColorScheme("light")}
       >
         Light
       </Button>
       <Button
         variant="filled"
-        color="rgba(0, 0, 0, 1)"
+        color="rgba(4, 0, 255, 1)"
         onClick={() => setColorScheme("dark")}
       >
         Dark
