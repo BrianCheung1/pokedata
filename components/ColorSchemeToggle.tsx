@@ -1,26 +1,24 @@
 "use client"
 
-import { Button, Group, useMantineColorScheme } from "@mantine/core"
+import { Group, useMantineColorScheme } from "@mantine/core"
 
 export function ColorSchemeToggle() {
-  const {setColorScheme } = useMantineColorScheme()
+  const { setColorScheme } = useMantineColorScheme()
 
   return (
     <Group justify="center" mt="sm">
-      <Button
-        variant="filled"
-        color="blue" // Adjust color values as needed
+      <button
+        className="bg-blue-500 hover:bg-blue-700 text-white  font-semibold py-1 px-2 rounded"
         onClick={() => setColorScheme("light")}
       >
         Light
-      </Button>
-      <Button
-        variant="filled"
-        color="blue" // Adjust color values as needed
+      </button>
+      <button
+        className="bg-blue-500 hover:bg-blue-700 text-white font-semibold py-1 px-2 rounded"
         onClick={() => setColorScheme("dark")}
       >
         Dark
-      </Button>
+      </button>
     </Group>
   )
 }
