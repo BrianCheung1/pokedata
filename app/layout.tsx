@@ -2,9 +2,6 @@ import "./globals.css"
 import type { Metadata } from "next"
 import { MantineProvider, ColorSchemeScript } from "@mantine/core"
 import "@mantine/core/styles.css"
-import { theme } from "../theme"
-
-
 
 export const metadata: Metadata = {
   title: "PokeData",
