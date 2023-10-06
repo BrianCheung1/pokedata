@@ -126,13 +126,13 @@ export const PokemonCard: React.FC<PokemonCardProps> = ({
         <hr className="h-px my-4 bg-gray-200 border-0 dark:bg-gray-700"></hr>
         Shiny Rate
         <Text size="md" c="dimmed">
-          Found in Egg: {pokemon?.shiny.found_egg ? "True" : "N/A"}
+          Found in Egg: {pokemon?.shiny?.found_egg ? "True" : "N/A"}
         </Text>
         <Text size="md" c="dimmed">
-          Found in Research: {pokemon?.shiny.found_research ? "True" : "N/A"}
+          Found in Research: {pokemon?.shiny?.found_research ? "True" : "N/A"}
         </Text>
         <Text size="md" c="dimmed">
-          Found in Wild: {pokemon?.shiny.found_wild ? "True" : "N/A"}
+          Found in Wild: {pokemon?.shiny?.found_wild ? "True" : "N/A"}
         </Text>
       </Card>
     </Skeleton>
