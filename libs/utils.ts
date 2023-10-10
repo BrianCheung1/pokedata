@@ -23,3 +23,14 @@ export const colors: Record<string, string> = {
   steel: "#B7B7CE",
   fairy: "#D685AD",
 }
+
+export const weather: Record<string, string> = {
+  sunny: "/images/sunny.png",
+  clear: "/images/clear.png",
+  rainy: "/images/rainy.png",
+  partly_cloudy: "/images/partly_cloudy.png",
+  overcast: "/images/cloudy.png",
+  windy: "/images/windy.png",
+  snow: "/images/snow.png",
+  fog: "/images/fog.png",
+}

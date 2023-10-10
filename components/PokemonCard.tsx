@@ -1,7 +1,8 @@
 import { capitalize } from "@/libs/utils"
 import { Card, Image, Text, Badge, Button, Group } from "@mantine/core"
-import { Skeleton, Grid, SimpleGrid } from "@mantine/core"
+import { Skeleton, Grid, SimpleGrid, Flex } from "@mantine/core"
 import { colors } from "@/libs/utils"
+import { weather } from "@/libs/utils"
 
 interface PokemonCardProps {
   pokemon: Record<string, any>
@@ -30,6 +31,25 @@ export const PokemonCard: React.FC<PokemonCardProps> = ({
         )
       }
     }
+    return list
+  }
+
+  const renderWeather = () => {
+    if (isLoading) {
+      return null
+    }
+    const list: any = []
+    pokemon?.pokemon_weather_boosted.forEach((boost: string) => {
+      const weatherCondition = weather[boost.toLowerCase()]
+      list.push(
+        <Image
+          src={weatherCondition}
+          w={50}
+          fit="contain"
+          alt="weather"
+        ></Image>
+      )
+    })
     return list
   }
 
@@ -82,6 +102,9 @@ export const PokemonCard: React.FC<PokemonCardProps> = ({
   return (
     <Skeleton visible={isLoading}>
       <Card shadow="sm" padding="lg" radius="md" withBorder>
+      <Text size="xl" fw={500} className="text-center">
+            {capitalize(pokemon?.pokemon_name)}
+          </Text>
         <Grid justify="space-evenly">
           <Grid.Col span="content" className="text-center">
             <Image src={pokemon?.sprite} h={200} fit="contain" alt="Pokemon" />
@@ -100,11 +123,16 @@ export const PokemonCard: React.FC<PokemonCardProps> = ({
             </Grid.Col>
           )}
         </Grid>
-        <Group justify="space-between" mt="md" mb="xs">
-          <Text size="xl" fw={500}>
-            {capitalize(pokemon?.pokemon_name)}
+        <Group justify="space-evenly" mt="md" mb="xs">
+          <Flex justify="center" align="center" gap="sm">
+            {renderBadges()}
+          </Flex>
+          <Flex justify="center" align="center" gap="sm">
+            {renderWeather()}
+          </Flex>
+          <Text size="sm" fw={500}>
+            {pokemon?.buddy_distance?.distance}KM
           </Text>
-          <Group justify="space-between">{renderBadges()}</Group>
         </Group>
         <Text size="xs">{pokemon?.pokemon_flavor_text}</Text>
         <hr className="h-px my-4 bg-gray-200 border-0 dark:bg-gray-700"></hr>
@@ -119,8 +147,6 @@ export const PokemonCard: React.FC<PokemonCardProps> = ({
           </Grid.Col>
         </Grid>
         <hr className="h-px my-4 bg-gray-200 border-0 dark:bg-gray-700"></hr>
-        {/* <Grid columns={24}>{renderTypeEffectiveness()}</Grid>
-        <hr className="h-px my-4 bg-gray-200 border-0 dark:bg-gray-700"></hr> */}
         Shiny Rate
         <Text size="md" c="dimmed">
           Found in Egg: {pokemon?.shiny?.found_egg ? "True" : "N/A"}
@@ -133,6 +159,9 @@ export const PokemonCard: React.FC<PokemonCardProps> = ({
         </Text>
         <hr className="h-px my-4 bg-gray-200 border-0 dark:bg-gray-700"></hr>
         Pokemon Stats
+        <Text size="md" c="dimmed">
+          Max CP: {pokemon?.pokemon_stats?.max_cp}
+        </Text>
         <Text size="md" c="dimmed">
           Base Attack: {pokemon?.pokemon_stats?.base_attack}
         </Text>

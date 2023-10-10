@@ -16,6 +16,8 @@ export async function GET(
     const pokemon_stats = await getPokemonStats(pokemon_name)
     const pokemon_flavor_text = await findFlavorText(pokemon_name)
     const shiny = await getShiny(pokemon_name)
+    const pokemon_weather_boosted = await findPokemonBoosted(pokemon_name)
+    const buddy_distance = await findPokemonBuddy(pokemon_name)
     return NextResponse.json(
       {
         msg: "Success",
@@ -27,6 +29,8 @@ export async function GET(
         shiny: shiny,
         pokemon_stats: pokemon_stats,
         pokemon_flavor_text: pokemon_flavor_text,
+        pokemon_weather_boosted: pokemon_weather_boosted,
+        buddy_distance: buddy_distance,
         sprite: `https://img.pokemondb.net/sprites/go/normal/${pokemon_name}.png`,
         sprite_shiny: `https://img.pokemondb.net/sprites/go/shiny/${pokemon_name}.png`,
       },
@@ -108,11 +112,58 @@ async function getPokemonStats(pokemon_name: string) {
   const response = await axios.get(
     `https://pogoapi.net/api/v1/pokemon_stats.json`
   )
-  return response.data.find(
+  const response2 = await axios.get(
+    `https://pogoapi.net/api/v1/pokemon_max_cp.json`
+  )
+  let stats = response.data.find(
     (pokemon: { pokemon_name: string; form: string }) =>
       pokemon.pokemon_name.toLowerCase() === pokemon_name &&
       pokemon.form === "Normal"
   )
+  stats.max_cp = response2.data.find(
+    (pokemon: { pokemon_name: string; form: string }) =>
+      pokemon.pokemon_name.toLowerCase() === pokemon_name &&
+      pokemon.form === "Normal"
+  ).max_cp
+  return stats
+}
+
+async function findPokemonBuddy(pokemon_name: string) {
+  const response = await axios.get(
+    "https://pogoapi.net/api/v1/pokemon_buddy_distances.json"
+  )
+  return Object.values(response.data)
+    .flat()
+    .find(
+      (pokemon: any) =>
+        pokemon.pokemon_name.toLowerCase() === pokemon_name.toLowerCase() &&
+        pokemon.form === "Normal"
+    )
+}
+
+async function findPokemonBoosted(pokemonName: string) {
+  try {
+    const response = await axios.get(
+      `https://pogoapi.net/api/v1/weather_boosts.json`
+    )
+    const pokemonDetails = await getPokemonDetails(pokemonName)
+    const pokemonTypes = await getPokemonTypes(pokemonDetails)
+    const [type1, type2] = pokemonTypes
+    let filteredWeather: string[] = []
+
+    for (const weather in response.data) {
+      if (
+        response.data[weather].includes(capitalize(type1)) ||
+        response.data[weather].includes(capitalize(type2))
+      ) {
+        filteredWeather.push(weather)
+      }
+    }
+    return filteredWeather
+  } catch (error) {
+    console.error("Error in findPokemonBoosted:", error)
+    throw error
+  }
 }
 
 async function findDualTypeDoubleDmgFrom(pokemonName: string) {
@@ -202,13 +253,16 @@ async function findDualTypeHalfDmgFrom(pokemonName: string) {
       const noDamageFrom1 = await getNoDmgFrom(type1)
       const noDamageFrom2 = await getNoDmgFrom(type2)
 
-
       let dualTypeResistant = [...halfDamageFrom1, ...halfDamageFrom2].filter(
         (val) =>
           !doubleDamageFrom1.includes(val) && !doubleDamageFrom2.includes(val)
       )
 
-      dualTypeResistant = [...dualTypeResistant, ...noDamageFrom1, ...noDamageFrom2]
+      dualTypeResistant = [
+        ...dualTypeResistant,
+        ...noDamageFrom1,
+        ...noDamageFrom2,
+      ]
 
       return Array.from(new Set(dualTypeResistant))
     } else {
