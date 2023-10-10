@@ -1,6 +1,9 @@
 import { NextResponse } from "next/server"
-import axios from "axios"
+import Axios from "axios"
 import { capitalize } from "@/libs/utils"
+import { setupCache } from "axios-cache-interceptor"
+
+const axios = setupCache(Axios)
 
 export async function GET(
   req: Request,
@@ -8,16 +11,39 @@ export async function GET(
 ) {
   const pokemon_name = params.pokemon_name.toLowerCase()
   try {
-    const type_vulnerable = await findDualTypeDoubleDmgFrom(pokemon_name)
-    const type_effectiveness = await findDualTypeDoubleDmgTo(pokemon_name)
+    // const type_vulnerable = await findDualTypeDoubleDmgFrom(pokemon_name)
+    // const type_effectiveness = await findDualTypeDoubleDmgTo(pokemon_name)
     const pokemon_details = await getPokemonDetails(pokemon_name)
-    const pokemon_types = await getPokemonTypes(pokemon_details)
-    const type_resistant = await findDualTypeHalfDmgFrom(pokemon_name)
-    const pokemon_stats = await getPokemonStats(pokemon_name)
-    const pokemon_flavor_text = await findFlavorText(pokemon_name)
-    const shiny = await getShiny(pokemon_name)
-    const pokemon_weather_boosted = await findPokemonBoosted(pokemon_name)
-    const buddy_distance = await findPokemonBuddy(pokemon_name)
+    // const pokemon_types = await getPokemonTypes(pokemon_details)
+    // const type_resistant = await findDualTypeHalfDmgFrom(pokemon_name)
+    // const pokemon_stats = await getPokemonStats(pokemon_name)
+    // const pokemon_flavor_text = await findFlavorText(pokemon_name)
+    // const shiny = await getShiny(pokemon_name)
+    // const pokemon_weather_boosted = await findPokemonBoosted(pokemon_name)
+    // const buddy_distance = await findPokemonBuddy(pokemon_name)
+
+    const [
+      type_vulnerable,
+      type_effectiveness,
+      pokemon_types,
+      type_resistant,
+      pokemon_stats,
+      pokemon_flavor_text,
+      shiny,
+      pokemon_weather_boosted,
+      buddy_distance,
+    ] = await Promise.all([
+      findDualTypeDoubleDmgFrom(pokemon_name),
+      findDualTypeDoubleDmgTo(pokemon_name),
+      getPokemonTypes(pokemon_details),
+      findDualTypeHalfDmgFrom(pokemon_name),
+      getPokemonStats(pokemon_name),
+      findFlavorText(pokemon_name),
+      getShiny(pokemon_name),
+      findPokemonBoosted(pokemon_name),
+      findPokemonBuddy(pokemon_name),
+    ])
+
     return NextResponse.json(
       {
         msg: "Success",

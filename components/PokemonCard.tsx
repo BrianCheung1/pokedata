@@ -1,14 +1,5 @@
 import { capitalize } from "@/libs/utils"
-import {
-  Card,
-  Text,
-  Skeleton,
-  Grid,
-  Flex,
-  Title,
-  Stack,
-  Tabs,
-} from "@mantine/core"
+import { Card, Text, Skeleton, Grid, Title, Stack, Tabs } from "@mantine/core"
 import { PokemonTypeVulnerable } from "./PokemonTypeVulnerable"
 import { PokemonTypeResistance } from "./PokemonTypeResistance"
 import { PokemonStats } from "./PokemonStats"

@@ -8,7 +8,7 @@ import { CloseButton } from '@mantine/core';
 
 export const SearchBar = () => {
   let currentPage = usePathname()
-  currentPage = currentPage.split("/").pop() as string
+  currentPage = currentPage.split("/").pop()?.replace(/[^a-zA-Z]/g, '') as string;
   const [value, setValue] = useState(currentPage)
   const { data: allPokemons = [], isLoading: isPokemonsLoading } =
     useAllPokemons()
