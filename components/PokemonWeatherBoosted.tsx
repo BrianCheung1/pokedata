@@ -6,17 +6,19 @@ interface PokemonWeatherBoostedProps {
 }
 
 export const PokemonWeatherBoosted: React.FC<PokemonWeatherBoostedProps> = ({
-  pokemon : {pokemon_weather_boosted},
+  pokemon: { pokemon_weather_boosted },
 }) => {
   const renderWeather = () => {
     const list: any = []
+    console.log(pokemon_weather_boosted)
     pokemon_weather_boosted?.forEach((boost: string) => {
+      if (boost === "Partly Cloudy") boost = "Partly"
       const weatherCondition = weather[boost.toLowerCase()]
       list.push(
         <Image
           src={weatherCondition}
-          w={30}
-          fit="contain"
+            w={35}
+          fit="fill"
           alt="weather"
         ></Image>
       )
@@ -27,7 +29,7 @@ export const PokemonWeatherBoosted: React.FC<PokemonWeatherBoostedProps> = ({
   return (
     <Stack justify="center" align="center">
       <Title order={5}>Boosted in</Title>
-      <Group>{renderWeather()}</Group>
+      <Group justify="center">{renderWeather()}</Group>
     </Stack>
   )
 }

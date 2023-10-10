@@ -28,7 +28,7 @@ export const weather: Record<string, string> = {
   sunny: "/images/sunny.png",
   clear: "/images/clear.png",
   rainy: "/images/rainy.png",
-  partly_cloudy: "/images/partly_cloudy.png",
+  partly: "/images/partly cloudy.png",
   overcast: "/images/cloudy.png",
   windy: "/images/windy.png",
   snow: "/images/snow.png",
