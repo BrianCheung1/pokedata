@@ -1,8 +1,22 @@
 import { capitalize } from "@/libs/utils"
-import { Card, Image, Text, Badge, Button, Group } from "@mantine/core"
-import { Skeleton, Grid, SimpleGrid, Flex } from "@mantine/core"
-import { colors } from "@/libs/utils"
-import { weather } from "@/libs/utils"
+import {
+  Card,
+  Text,
+  Skeleton,
+  Grid,
+  Flex,
+  Title,
+  Stack,
+  Tabs,
+} from "@mantine/core"
+import { PokemonTypeVulnerable } from "./PokemonTypeVulnerable"
+import { PokemonTypeResistance } from "./PokemonTypeResistance"
+import { PokemonStats } from "./PokemonStats"
+import { PokemonShiny } from "./PokemonShiny"
+import { PokemonImages } from "./PokemonImages"
+import { PokemonTypes } from "./PokemonTypes"
+import { PokemonWeatherBoosted } from "./PokemonWeatherBoosted"
+import { PokemonMoves } from "./PokemonMoves"
 
 interface PokemonCardProps {
   pokemon: Record<string, any>
@@ -13,165 +27,89 @@ export const PokemonCard: React.FC<PokemonCardProps> = ({
   pokemon,
   isLoading,
 }) => {
-  const renderTypeEffectiveness = () => {
-    const list = []
-
-    for (const key in pokemon?.type_effectiveness) {
-      if (key)
-        list.push(
-          <Grid.Col key={pokemon?.type_effectiveness[key]}>
-            {`${capitalize(key)} Moves`}:
-          </Grid.Col>
-        )
-      for (const key2 in pokemon?.type_effectiveness[key]) {
-        list.push(
-          <Grid.Col
-            key={key + key2 + pokemon?.type_effectiveness[key][key2]}
-          >{`Effective against ${pokemon?.type_effectiveness[key][key2]} types`}</Grid.Col>
-        )
-      }
-    }
-    return list
-  }
-
-  const renderWeather = () => {
-    if (isLoading) {
-      return null
-    }
-    const list: any = []
-    pokemon?.pokemon_weather_boosted.forEach((boost: string) => {
-      const weatherCondition = weather[boost.toLowerCase()]
-      list.push(
-        <Image
-          src={weatherCondition}
-          w={50}
-          fit="contain"
-          alt="weather"
-        ></Image>
-      )
-    })
-    return list
-  }
-
-  const renderTypeVulnerable = () => {
-    const list: any = []
-    pokemon?.type_vulnerable?.sort().forEach((element: string) => {
-      list.push(
-        <Badge
-          key={element}
-          className="mr-2"
-          color={colors[element.toLowerCase()]}
-        >
-          {element}
-        </Badge>
-      )
-    })
-    return list
-  }
-
-  const renderTypeResistances = () => {
-    const list: any = []
-    pokemon?.type_resistant?.sort().forEach((element: string) => {
-      list.push(
-        <Badge
-          key={element}
-          className="mr-2"
-          color={colors[element.toLowerCase()]}
-        >
-          {element}
-        </Badge>
-      )
-    })
-    return list
-  }
-
-  const renderBadges = () => {
-    const list = []
-    for (const pokemon_types in pokemon?.pokemon_types) {
-      list.push(
-        <Badge
-          key={pokemon_types}
-          color={colors[pokemon.pokemon_types[pokemon_types]]}
-        >
-          {pokemon?.pokemon_types[pokemon_types]}
-        </Badge>
-      )
-    }
-    return list
-  }
   return (
-    <Skeleton visible={isLoading}>
-      <Card shadow="sm" padding="lg" radius="md" withBorder>
-      <Text size="xl" fw={500} className="text-center">
-            {capitalize(pokemon?.pokemon_name)}
-          </Text>
-        <Grid justify="space-evenly">
-          <Grid.Col span="content" className="text-center">
-            <Image src={pokemon?.sprite} h={200} fit="contain" alt="Pokemon" />
-            <Badge>Base</Badge>
-          </Grid.Col>
+    <Tabs variant="pills" defaultValue="details">
+      <Tabs.List justify="center">
+        <Tabs.Tab value="details">Details</Tabs.Tab>
+        <Tabs.Tab value="shiny">Shiny Rates</Tabs.Tab>
+        <Tabs.Tab value="moves">Moves</Tabs.Tab>
+      </Tabs.List>
 
-          {pokemon?.shiny && (
-            <Grid.Col span="content" className="text-center">
-              <Image
-                src={pokemon?.sprite_shiny}
-                h={200}
-                fit="contain"
-                alt="Pokemon"
-              />
-              <Badge color="#F7D02C">Shiny</Badge>
-            </Grid.Col>
-          )}
-        </Grid>
-        <Group justify="space-evenly" mt="md" mb="xs">
-          <Flex justify="center" align="center" gap="sm">
-            {renderBadges()}
-          </Flex>
-          <Flex justify="center" align="center" gap="sm">
-            {renderWeather()}
-          </Flex>
-          <Text size="sm" fw={500}>
-            {pokemon?.buddy_distance?.distance}KM
-          </Text>
-        </Group>
-        <Text size="xs">{pokemon?.pokemon_flavor_text}</Text>
-        <hr className="h-px my-4 bg-gray-200 border-0 dark:bg-gray-700"></hr>
-        <Grid className="text-center">
-          <Grid.Col span={6}>
-            <Text>Resistant To</Text>
-            {renderTypeResistances()}
-          </Grid.Col>
-          <Grid.Col span={6}>
-            <Text>Vulnerable To</Text>
-            {renderTypeVulnerable()}
-          </Grid.Col>
-        </Grid>
-        <hr className="h-px my-4 bg-gray-200 border-0 dark:bg-gray-700"></hr>
-        Shiny Rate
-        <Text size="md" c="dimmed">
-          Found in Egg: {pokemon?.shiny?.found_egg ? "True" : "N/A"}
-        </Text>
-        <Text size="md" c="dimmed">
-          Found in Research: {pokemon?.shiny?.found_research ? "True" : "N/A"}
-        </Text>
-        <Text size="md" c="dimmed">
-          Found in Wild: {pokemon?.shiny?.found_wild ? "True" : "N/A"}
-        </Text>
-        <hr className="h-px my-4 bg-gray-200 border-0 dark:bg-gray-700"></hr>
-        Pokemon Stats
-        <Text size="md" c="dimmed">
-          Max CP: {pokemon?.pokemon_stats?.max_cp}
-        </Text>
-        <Text size="md" c="dimmed">
-          Base Attack: {pokemon?.pokemon_stats?.base_attack}
-        </Text>
-        <Text size="md" c="dimmed">
-          Base Defense: {pokemon?.pokemon_stats?.base_defense}
-        </Text>
-        <Text size="md" c="dimmed">
-          Base Stamina: {pokemon?.pokemon_stats?.base_stamina}
-        </Text>
-      </Card>
-    </Skeleton>
+      <Tabs.Panel value="details">
+        <Skeleton visible={isLoading}>
+          <Card shadow="sm" padding="lg" radius="md" withBorder>
+            <Title className="text-center" order={1}>
+              {capitalize(pokemon?.pokemon_name)}
+            </Title>
+            <Text
+              size="xs"
+              c="dimmed"
+              className="text-center"
+            >{`"${pokemon?.pokemon_flavor_text}"`}</Text>
+            <PokemonImages pokemon={pokemon} />
+            <hr className="h-px my-4 bg-gray-200 border-0 dark:bg-gray-700"></hr>
+            <Grid justify="space-around" className="text-center">
+              <Grid.Col span={3}>
+                <PokemonTypes pokemon={pokemon} />
+              </Grid.Col>
+              <Grid.Col span={3}>
+                <PokemonWeatherBoosted pokemon={pokemon} />
+              </Grid.Col>
+              <Grid.Col span={3}>
+                <Stack justify="center" align="center">
+                  <Title order={5}>Buddy Distance</Title>
+                  {pokemon?.buddy_distance?.distance}KM
+                </Stack>
+              </Grid.Col>
+            </Grid>
+            <hr className="h-px my-4 bg-gray-200 border-0 dark:bg-gray-700"></hr>
+            <Grid className="text-center">
+              <Grid.Col span={6}>
+                <PokemonTypeResistance pokemon={pokemon} />
+              </Grid.Col>
+              <Grid.Col span={6}>
+                <PokemonTypeVulnerable pokemon={pokemon} />
+              </Grid.Col>
+            </Grid>
+            <hr className="h-px my-4 bg-gray-200 border-0 dark:bg-gray-700"></hr>
+            <PokemonStats pokemon={pokemon} />
+          </Card>
+        </Skeleton>
+      </Tabs.Panel>
+      <Tabs.Panel value="shiny">
+        <Skeleton visible={isLoading}>
+          <Card shadow="sm" padding="lg" radius="md" withBorder>
+            <Title className="text-center" order={1}>
+              {capitalize(pokemon?.pokemon_name)}
+            </Title>
+            <Text
+              size="xs"
+              c="dimmed"
+              className="text-center"
+            >{`"${pokemon?.pokemon_flavor_text}"`}</Text>
+            <PokemonImages pokemon={pokemon} />
+            <hr className="h-px my-4 bg-gray-200 border-0 dark:bg-gray-700"></hr>
+            <PokemonShiny pokemon={pokemon} />
+          </Card>
+        </Skeleton>
+      </Tabs.Panel>
+      <Tabs.Panel value="moves">
+        <Skeleton visible={isLoading}>
+          <Card shadow="sm" padding="lg" radius="md" withBorder>
+            <Title className="text-center" order={1}>
+              {capitalize(pokemon?.pokemon_name)}
+            </Title>
+            <Text
+              size="xs"
+              c="dimmed"
+              className="text-center"
+            >{`"${pokemon?.pokemon_flavor_text}"`}</Text>
+            <PokemonImages pokemon={pokemon} />
+            <hr className="h-px my-4 bg-gray-200 border-0 dark:bg-gray-700"></hr>
+            <PokemonMoves pokemon={pokemon} />
+          </Card>
+        </Skeleton>
+      </Tabs.Panel>
+    </Tabs>
   )
 }

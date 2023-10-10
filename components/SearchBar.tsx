@@ -4,6 +4,7 @@ import { Autocomplete } from "@mantine/core"
 import useAllPokemons from "@/hooks/useAllPokemons"
 import { Container, Stack } from "@mantine/core"
 import { useRouter, usePathname } from "next/navigation"
+import { CloseButton } from '@mantine/core';
 
 export const SearchBar = () => {
   let currentPage = usePathname()
@@ -35,12 +36,11 @@ export const SearchBar = () => {
             }}
             rightSection={
               value && (
-                <button
+                <CloseButton
                   onClick={handleClear}
                   className="cursor-pointer outline-none focus:outline-none"
                 >
-                  &#10006;
-                </button>
+                </CloseButton>
               )
             }
           />
