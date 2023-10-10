@@ -10,7 +10,6 @@ export const PokemonWeatherBoosted: React.FC<PokemonWeatherBoostedProps> = ({
 }) => {
   const renderWeather = () => {
     const list: any = []
-    console.log(pokemon_weather_boosted)
     pokemon_weather_boosted?.forEach((boost: string) => {
       if (boost === "Partly Cloudy") boost = "Partly"
       const weatherCondition = weather[boost.toLowerCase()]

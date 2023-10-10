@@ -2,7 +2,9 @@ import { NextResponse } from "next/server"
 import Axios from "axios"
 import { capitalize } from "@/libs/utils"
 import { setupCache } from "axios-cache-interceptor"
+const DEFAULT_CACHE_TIME = 5 * 60 * 1000
 
+//default cache time 5mins
 const axios = setupCache(Axios)
 
 export async function GET(
@@ -11,17 +13,7 @@ export async function GET(
 ) {
   const pokemon_name = params.pokemon_name.toLowerCase()
   try {
-    // const type_vulnerable = await findDualTypeDoubleDmgFrom(pokemon_name)
-    // const type_effectiveness = await findDualTypeDoubleDmgTo(pokemon_name)
     const pokemon_details = await getPokemonDetails(pokemon_name)
-    // const pokemon_types = await getPokemonTypes(pokemon_details)
-    // const type_resistant = await findDualTypeHalfDmgFrom(pokemon_name)
-    // const pokemon_stats = await getPokemonStats(pokemon_name)
-    // const pokemon_flavor_text = await findFlavorText(pokemon_name)
-    // const shiny = await getShiny(pokemon_name)
-    // const pokemon_weather_boosted = await findPokemonBoosted(pokemon_name)
-    // const buddy_distance = await findPokemonBuddy(pokemon_name)
-
     const [
       type_vulnerable,
       type_effectiveness,
@@ -64,7 +56,7 @@ export async function GET(
     )
   } catch (error) {
     console.log(error)
-    return NextResponse.json({ msg: error }, { status: 500 })
+    return NextResponse.json({ msg: "Get Error", error }, { status: 500 })
   }
 }
 
@@ -84,7 +76,6 @@ async function getFlavorTextEntries(pokemonName: string) {
 
 async function getTypeDoubleDmgFrom(typeName: string) {
   const response = await axios.get(`https://pokeapi.co/api/v2/type/${typeName}`)
-  // const data = await response.json()
   return response.data.damage_relations.double_damage_from.map(
     (type: { name: string }) => capitalize(type.name)
   )
@@ -92,7 +83,6 @@ async function getTypeDoubleDmgFrom(typeName: string) {
 
 async function getTypeHalfDmgFrom(typeName: string) {
   const response = await axios.get(`https://pokeapi.co/api/v2/type/${typeName}`)
-  // const data = await response.json()
   return response.data.damage_relations.half_damage_from.map(
     (type: { name: string }) => capitalize(type.name)
   )
@@ -100,7 +90,6 @@ async function getTypeHalfDmgFrom(typeName: string) {
 
 async function getTypeDoubleDmgTo(typeName: string) {
   const response = await axios.get(`https://pokeapi.co/api/v2/type/${typeName}`)
-  // const data = await response.json()
   return response.data.damage_relations.double_damage_to.map(
     (type: { name: string }) => type.name
   )
@@ -108,7 +97,6 @@ async function getTypeDoubleDmgTo(typeName: string) {
 
 async function getTypeHalfDmgTo(typeName: string) {
   const response = await axios.get(`https://pokeapi.co/api/v2/type/${typeName}`)
-  // const data = await response.json()
   return response.data.damage_relations.double_damage_to.map(
     (type: { name: string }) => type.name
   )
@@ -116,7 +104,6 @@ async function getTypeHalfDmgTo(typeName: string) {
 
 async function getNoDmgFrom(typeName: string) {
   const response = await axios.get(`https://pokeapi.co/api/v2/type/${typeName}`)
-  // const data = await response.json()
   return response.data.damage_relations.no_damage_from.map(
     (type: { name: string }) => capitalize(type.name)
   )
@@ -155,16 +142,23 @@ async function getPokemonStats(pokemon_name: string) {
 }
 
 async function findPokemonBuddy(pokemon_name: string) {
-  const response = await axios.get(
-    "https://pogoapi.net/api/v1/pokemon_buddy_distances.json"
-  )
-  return Object.values(response.data)
-    .flat()
-    .find(
-      (pokemon: any) =>
-        pokemon.pokemon_name.toLowerCase() === pokemon_name.toLowerCase() &&
-        pokemon.form === "Normal"
+  try {
+    const response = await axios.get(
+      "https://pogoapi.net/api/v1/pokemon_buddy_distances.json"
     )
+    return Object.values(response.data)
+      .flat()
+      .find(
+        (pokemon: any) =>
+          pokemon.pokemon_name.toLowerCase() === pokemon_name.toLowerCase() &&
+          pokemon.form === "Normal"
+      )
+  } catch (error) {
+    return NextResponse.json(
+      { msg: "findPokemonBuddy Error", error },
+      { status: 500 }
+    )
+  }
 }
 
 async function findPokemonBoosted(pokemonName: string) {
@@ -187,8 +181,10 @@ async function findPokemonBoosted(pokemonName: string) {
     }
     return filteredWeather
   } catch (error) {
-    console.error("Error in findPokemonBoosted:", error)
-    throw error
+    return NextResponse.json(
+      { msg: "findPokemonBoosted Error", error },
+      { status: 500 }
+    )
   }
 }
 
@@ -227,7 +223,10 @@ async function findDualTypeDoubleDmgFrom(pokemonName: string) {
       return doubleDamageFrom
     }
   } catch (error) {
-    return NextResponse.json({ msg: error }, { status: 500 })
+    return NextResponse.json(
+      { msg: "findDualTypeDoubleDmgFrom Error", error },
+      { status: 500 }
+    )
   }
 }
 async function findDualTypeDoubleDmgTo(pokemonName: string) {
@@ -258,7 +257,10 @@ async function findDualTypeDoubleDmgTo(pokemonName: string) {
       return doubleDmgTo
     }
   } catch (error) {
-    return NextResponse.json({ msg: error }, { status: 500 })
+    return NextResponse.json(
+      { msg: "findDualTypeDoubleDmgTo error", error },
+      { status: 500 }
+    )
   }
 }
 
@@ -297,7 +299,10 @@ async function findDualTypeHalfDmgFrom(pokemonName: string) {
       return halfDamageFrom
     }
   } catch (error) {
-    return NextResponse.json({ msg: error }, { status: 500 })
+    return NextResponse.json(
+      { msg: "findDualTypeHalfDmgFrom error", error },
+      { status: 500 }
+    )
   }
 }
 
@@ -310,6 +315,9 @@ async function findFlavorText(pokemonName: string) {
     )
     return flavorText.pop().flavor_text
   } catch (error) {
-    return NextResponse.json({ msg: error }, { status: 500 })
+    return NextResponse.json(
+      { msg: "findFlavorText error", error },
+      { status: 500 }
+    )
   }
 }

@@ -21,6 +21,9 @@ export const PokemonTypeResistance: React.FC<PokemonTypeResistanceProps> = ({
         </Badge>
       )
     })
+    if(list.length === 0){
+        return <Badge>N/A</Badge>
+    }
     return list
   }
 

@@ -59,7 +59,7 @@ export const SearchBar = () => {
           data={
             isPokemonsLoading
               ? []
-              : allPokemons.pokemons.map(
+              : allPokemons?.pokemons?.map(
                   (pokemon: { name: any }) => pokemon.name
                 )
           }
