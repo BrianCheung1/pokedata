@@ -84,6 +84,14 @@ async function getTypeHalfDmgTo(typeName: string) {
   )
 }
 
+async function getNoDmgFrom(typeName: string) {
+  const response = await axios.get(`https://pokeapi.co/api/v2/type/${typeName}`)
+  // const data = await response.json()
+  return response.data.damage_relations.no_damage_from.map(
+    (type: { name: string }) => capitalize(type.name)
+  )
+}
+
 function getPokemonTypes(pokemon: { types: { type: { name: string } }[] }) {
   return pokemon.types.map((type: { type: { name: string } }) => type.type.name)
 }
@@ -121,12 +129,18 @@ async function findDualTypeDoubleDmgFrom(pokemonName: string) {
       const halfDamageFrom1 = await getTypeHalfDmgFrom(type1)
       const halfDamageFrom2 = await getTypeHalfDmgFrom(type2)
 
+      const noDamageFrom1 = await getNoDmgFrom(type1)
+      const noDamageFrom2 = await getNoDmgFrom(type2)
+
       const dualTypeVulnerable = [
         ...doubleDamageFrom1,
         ...doubleDamageFrom2,
       ].filter(
         (val) =>
-          !halfDamageFrom1.includes(val) && !halfDamageFrom2.includes(val)
+          !halfDamageFrom1.includes(val) &&
+          !halfDamageFrom2.includes(val) &&
+          !noDamageFrom1.includes(val) &&
+          !noDamageFrom2.includes(val)
       )
 
       return Array.from(new Set(dualTypeVulnerable))
@@ -185,10 +199,16 @@ async function findDualTypeHalfDmgFrom(pokemonName: string) {
       const halfDamageFrom1 = await getTypeHalfDmgFrom(type1)
       const halfDamageFrom2 = await getTypeHalfDmgFrom(type2)
 
-      const dualTypeResistant = [...halfDamageFrom1, ...halfDamageFrom2].filter(
+      const noDamageFrom1 = await getNoDmgFrom(type1)
+      const noDamageFrom2 = await getNoDmgFrom(type2)
+
+
+      let dualTypeResistant = [...halfDamageFrom1, ...halfDamageFrom2].filter(
         (val) =>
           !doubleDamageFrom1.includes(val) && !doubleDamageFrom2.includes(val)
       )
+
+      dualTypeResistant = [...dualTypeResistant, ...noDamageFrom1, ...noDamageFrom2]
 
       return Array.from(new Set(dualTypeResistant))
     } else {

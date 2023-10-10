@@ -16,10 +16,17 @@ export const PokemonCard: React.FC<PokemonCardProps> = ({
     const list = []
 
     for (const key in pokemon?.type_effectiveness) {
-      if (key) list.push(<div>{`${capitalize(key)} Moves`}:</div>)
+      if (key)
+        list.push(
+          <Grid.Col key={pokemon?.type_effectiveness[key]}>
+            {`${capitalize(key)} Moves`}:
+          </Grid.Col>
+        )
       for (const key2 in pokemon?.type_effectiveness[key]) {
         list.push(
-          <div>{`Effective against ${pokemon?.type_effectiveness[key][key2]} types`}</div>
+          <Grid.Col
+            key={key + key2 + pokemon?.type_effectiveness[key][key2]}
+          >{`Effective against ${pokemon?.type_effectiveness[key][key2]} types`}</Grid.Col>
         )
       }
     }
@@ -30,7 +37,11 @@ export const PokemonCard: React.FC<PokemonCardProps> = ({
     const list: any = []
     pokemon?.type_vulnerable?.sort().forEach((element: string) => {
       list.push(
-        <Badge className="mr-2" color={colors[element.toLowerCase()]}>
+        <Badge
+          key={element}
+          className="mr-2"
+          color={colors[element.toLowerCase()]}
+        >
           {element}
         </Badge>
       )
@@ -42,7 +53,11 @@ export const PokemonCard: React.FC<PokemonCardProps> = ({
     const list: any = []
     pokemon?.type_resistant?.sort().forEach((element: string) => {
       list.push(
-        <Badge className="mr-2" color={colors[element.toLowerCase()]}>
+        <Badge
+          key={element}
+          className="mr-2"
+          color={colors[element.toLowerCase()]}
+        >
           {element}
         </Badge>
       )
@@ -54,40 +69,29 @@ export const PokemonCard: React.FC<PokemonCardProps> = ({
     const list = []
     for (const pokemon_types in pokemon?.pokemon_types) {
       list.push(
-        <Badge color={colors[pokemon.pokemon_types[pokemon_types]]}>
+        <Badge
+          key={pokemon_types}
+          color={colors[pokemon.pokemon_types[pokemon_types]]}
+        >
           {pokemon?.pokemon_types[pokemon_types]}
         </Badge>
       )
     }
     return list
   }
-
   return (
     <Skeleton visible={isLoading}>
       <Card shadow="sm" padding="lg" radius="md" withBorder>
-        <Grid justify="center">
+        <Grid justify="space-evenly">
           <Grid.Col span="content" className="text-center">
-            <Image
-              src={
-                pokemon?.sprite
-                  ? `${pokemon?.sprite}`
-                  : `/images/og-default-image.jpeg`
-              }
-              h={200}
-              fit="contain"
-              alt="Pokemon"
-            />
+            <Image src={pokemon?.sprite} h={200} fit="contain" alt="Pokemon" />
             <Badge>Base</Badge>
           </Grid.Col>
 
           {pokemon?.shiny && (
             <Grid.Col span="content" className="text-center">
               <Image
-                src={
-                  pokemon?.sprite_shiny
-                    ? `${pokemon?.sprite_shiny}`
-                    : `/images/og-default-image.jpeg`
-                }
+                src={pokemon?.sprite_shiny}
                 h={200}
                 fit="contain"
                 alt="Pokemon"
@@ -101,28 +105,22 @@ export const PokemonCard: React.FC<PokemonCardProps> = ({
             {capitalize(pokemon?.pokemon_name)}
           </Text>
           <Group justify="space-between">{renderBadges()}</Group>
-          <Text size="xs">{pokemon?.pokemon_flavor_text}</Text>
         </Group>
+        <Text size="xs">{pokemon?.pokemon_flavor_text}</Text>
         <hr className="h-px my-4 bg-gray-200 border-0 dark:bg-gray-700"></hr>
         <Grid className="text-center">
           <Grid.Col span={6}>
-            Resistant To
-            <Text size="md" c="dimmed">
-              {renderTypeResistances()}
-            </Text>
+            <Text>Resistant To</Text>
+            {renderTypeResistances()}
           </Grid.Col>
           <Grid.Col span={6}>
-            Vulnerable To
-            <Text size="md" c="dimmed">
-              {renderTypeVulnerable()}
-            </Text>
+            <Text>Vulnerable To</Text>
+            {renderTypeVulnerable()}
           </Grid.Col>
         </Grid>
         <hr className="h-px my-4 bg-gray-200 border-0 dark:bg-gray-700"></hr>
-        <Text size="md" c="dimmed">
-          {renderTypeEffectiveness()}
-        </Text>
-        <hr className="h-px my-4 bg-gray-200 border-0 dark:bg-gray-700"></hr>
+        {/* <Grid columns={24}>{renderTypeEffectiveness()}</Grid>
+        <hr className="h-px my-4 bg-gray-200 border-0 dark:bg-gray-700"></hr> */}
         Shiny Rate
         <Text size="md" c="dimmed">
           Found in Egg: {pokemon?.shiny?.found_egg ? "True" : "N/A"}

@@ -1,28 +1,59 @@
 "use client"
-import { useState } from "react"
-import usePokemon from "@/hooks/usePokemon"
-import { PokemonCard } from "./PokemonCard"
+import { useState, useRef } from "react"
 import { Autocomplete } from "@mantine/core"
 import useAllPokemons from "@/hooks/useAllPokemons"
 import { Container, Stack } from "@mantine/core"
+import { useRouter, usePathname } from "next/navigation"
 
 export const SearchBar = () => {
-  const [submittedTerm, setSubmittedTerm] = useState("")
-  const { data: pokemon = [], isLoading } = usePokemon(submittedTerm)
+  let currentPage = usePathname()
+  currentPage = currentPage.split("/").pop() as string
+  const [value, setValue] = useState(currentPage)
   const { data: allPokemons = [], isLoading: isPokemonsLoading } =
     useAllPokemons()
+  const router = useRouter()
+
+  const handleClear = () => {
+    setValue("")
+  }
 
   if (isPokemonsLoading) {
-    return null
+    return (
+      <Container fluid className="mt-5 flex items-center justify-center">
+        <Stack className="w-full md:w-2/3 lg:w-1/2">
+          <Autocomplete
+            value={value}
+            className="flex items-center justify-center"
+            placeholder="Search term..."
+            data={[]}
+            onChange={(value) => {
+              setValue(value)
+            }}
+            maxDropdownHeight={200}
+            onOptionSubmit={(value) => {
+              router.push(`/pokemons/${value}`)
+            }}
+            rightSection={
+              value && (
+                <button
+                  onClick={handleClear}
+                  className="cursor-pointer outline-none focus:outline-none"
+                >
+                  &#10006;
+                </button>
+              )
+            }
+          />
+        </Stack>
+      </Container>
+    )
   }
 
   return (
-    <Container
-      size="responsive"
-      className="mt-5 flex items-center justify-center "
-    >
-      <Stack className="w-56 md:w-2/3 lg:w-1/2">
+    <Container fluid className="mt-5 flex items-center justify-center">
+      <Stack className="w-full md:w-2/3 lg:w-1/2">
         <Autocomplete
+          value={value}
           className="flex items-center justify-center"
           placeholder="Search term..."
           data={
@@ -32,14 +63,24 @@ export const SearchBar = () => {
                   (pokemon: { name: any }) => pokemon.name
                 )
           }
-          limit={5}
-          onOptionSubmit={(value) => {
-            setSubmittedTerm(value)
+          onChange={(value) => {
+            setValue(value)
           }}
+          maxDropdownHeight={200}
+          onOptionSubmit={(value) => {
+            router.push(`/pokemons/${value}`)
+          }}
+          rightSection={
+            value && (
+              <button
+                onClick={handleClear}
+                className="cursor-pointer outline-none focus:outline-none"
+              >
+                &#10006;
+              </button>
+            )
+          }
         />
-        {submittedTerm && (
-          <PokemonCard pokemon={pokemon} isLoading={isLoading} />
-        )}
       </Stack>
     </Container>
   )
