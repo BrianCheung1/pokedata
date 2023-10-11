@@ -1,4 +1,4 @@
-import { Text, Grid, Image, Badge, Title } from "@mantine/core"
+import { Text, Grid, Image, Badge, Title, Table } from "@mantine/core"
 import { capitalize } from "@/libs/utils"
 
 interface PokemonMoves {
@@ -44,33 +44,101 @@ export const PokemonMoves: React.FC<PokemonMoves> = ({
     return list
   }
 
-  const renderMoves = () => {
-    const list: any[] = []
+  const renderFastMoves = moves?.fast_moves?.map((move: any) => (
+    <Table.Tr key={move.name}>
+      <Table.Td>{move.name}</Table.Td>
+      <Table.Td>{move.dps}</Table.Td>
+      <Table.Td>{move.dpe}</Table.Td>
+      <Table.Td>{move.eps}</Table.Td>
+      <Table.Td>N/A</Table.Td>
+      <Table.Td>{move.type}</Table.Td>
+    </Table.Tr>
+  ))
 
-    list.push(<Grid.Col>Fast Moves</Grid.Col>)
-    moves?.fast_moves?.map((move:any) => {
-      list.push(
-        <Grid.Col>
-          Move Name: {move.name} Dps: {move.dps} Type: {move.type}
-        </Grid.Col>
-      )
-    })
-    list.push(<Grid.Col>Charged Moves</Grid.Col>)
-    moves?.charged_moves?.map((move:any) => {
-      list.push(
-        <Grid.Col>
-          Move Name: {move.name} Dps: {move.dps} Type: {move.type}
-        </Grid.Col>
-      )
-    })
+  const renderEliteFastMoves =
+    moves?.fast_charged_moves?.length > 0 ? (
+      moves?.elite_fast_moves?.map((move: any) => (
+        <Table.Tr key={move.name}>
+          <Table.Td>{move.name}</Table.Td>
+          <Table.Td>{move.dps}</Table.Td>
+          <Table.Td>{move.dpe}</Table.Td>
+          <Table.Td>{move.eps}</Table.Td>
+          <Table.Td>N/A</Table.Td>
+          <Table.Td>{move.type}</Table.Td>
+        </Table.Tr>
+      ))
+    ) : (
+      <Table.Tr>
+        <Table.Td>N/A</Table.Td>
+      </Table.Tr>
+    )
 
-    return list
-  }
+  const renderChargedMoves = moves?.charged_moves?.map((move: any) => (
+    <Table.Tr key={move.name}>
+      <Table.Td>{move.name}</Table.Td>
+      <Table.Td>{move.dps}</Table.Td>
+      <Table.Td>{move.dpe}</Table.Td>
+      <Table.Td>{move.eps}</Table.Td>
+      <Table.Td>{move.total}</Table.Td>
+      <Table.Td>{move.type}</Table.Td>
+    </Table.Tr>
+  ))
+
+  const renderEliteChargedMoves =
+    moves?.elite_charged_moves.length > 0 ? (
+      moves?.elite_charged_moves?.map((move: any) => (
+        <Table.Tr key={move.name}>
+          <Table.Td>{move.name}</Table.Td>
+          <Table.Td>{move.dps}</Table.Td>
+          <Table.Td>{move.dpe}</Table.Td>
+          <Table.Td>{move.eps}</Table.Td>
+          <Table.Td>{move.total}</Table.Td>
+          <Table.Td>{move.type}</Table.Td>
+        </Table.Tr>
+      ))
+    ) : (
+      <Table.Tr>
+        <Table.Td>N/A</Table.Td>
+      </Table.Tr>
+    )
+
   return (
-    <>
-      <Grid>
-        {renderTypeEffectiveness()} {renderMoves()}
-      </Grid>
-    </>
+    <Table.ScrollContainer minWidth={500}>
+      {/* {renderTypeEffectiveness()}  */}
+      <Table horizontalSpacing="md" withColumnBorders>
+        <Table.Thead>
+          <Table.Tr>
+            <Table.Th>Fast Moves</Table.Th>
+          </Table.Tr>
+          <Table.Tr>
+            <Table.Th>Move name</Table.Th>
+            <Table.Th>DPS</Table.Th>
+            <Table.Th>DPE</Table.Th>
+            <Table.Th>EPS</Table.Th>
+            <Table.Th>DPS*DPE</Table.Th>
+            <Table.Th>Move type</Table.Th>
+          </Table.Tr>
+        </Table.Thead>
+        <Table.Tbody>{renderFastMoves}</Table.Tbody>
+        <Table.Thead>
+          <Table.Tr>
+            <Table.Th>Elite Fast Moves</Table.Th>
+          </Table.Tr>
+        </Table.Thead>
+        <Table.Tbody>{renderEliteFastMoves}</Table.Tbody>
+        <Table.Thead>
+          <Table.Tr>
+            <Table.Th>Charged Moves</Table.Th>
+          </Table.Tr>
+        </Table.Thead>
+        <Table.Tbody>{renderChargedMoves}</Table.Tbody>
+        <Table.Thead>
+          <Table.Tr>
+            <Table.Th>Elite Charged Moves</Table.Th>
+          </Table.Tr>
+        </Table.Thead>
+        <Table.Tbody>{renderEliteChargedMoves}</Table.Tbody>
+      </Table>
+    </Table.ScrollContainer>
   )
 }

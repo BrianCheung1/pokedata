@@ -127,85 +127,73 @@ async function getCurrentMoves(pokemonName: string) {
       pokemon.pokemon_name.toLowerCase() === pokemonName &&
       pokemon.form === "Normal"
   )
-  let fastMoves = []
-  const fastMovePromises = pokemonMoves.fast_moves.map(
-    async (element: string) => {
-      try {
-        let fastMovesDetails = await getFastMove(element)
+  if (response.cached) return pokemonMoves
+  // Helper function to handle move details retrieval
+  const fetchMoveDetails = async (moveName: string, isCharged: boolean) => {
+    try {
+      const moveDetails = (await isCharged)
+        ? await getChargedMove(moveName)
+        : await getFastMove(moveName)
 
-        if (
-          fastMovesDetails &&
-          fastMovesDetails.power &&
-          fastMovesDetails.duration
-        ) {
-          fastMovesDetails = {
-            name: fastMovesDetails.name,
-            dps: (
-              (fastMovesDetails.power / fastMovesDetails.duration) *
-              1000
-            ).toFixed(2),
-            type: fastMovesDetails.type,
-          }
-        } else {
-          // Handle invalid data
-          console.error(
-            `Invalid data for fast move: ${JSON.stringify(fastMovesDetails)}`
-          )
-          fastMovesDetails = { name: "Unknown", dps: "0.00" }
+      if (moveDetails && moveDetails.power && moveDetails.duration) {
+        return {
+          name: moveDetails.name,
+          dps: ((moveDetails.power / moveDetails.duration) * 1000).toFixed(2),
+          dpe: Math.abs(moveDetails.power / moveDetails.energy_delta).toFixed(
+            2
+          ),
+          eps: (
+            (moveDetails.energy_delta / moveDetails.duration) *
+            1000
+          ).toFixed(2),
+
+          total: (
+            (moveDetails.power / moveDetails.duration) *
+            1000 *
+            Math.abs(moveDetails.power / moveDetails.energy_delta)
+          ).toFixed(2),
+          type: moveDetails.type,
         }
-
-        return fastMovesDetails
-      } catch (error) {
-        // Handle errors from getFastMove
-        console.error(`Error fetching fast move details: ${error}`)
+      } else {
+        console.error(`Invalid data for move: ${JSON.stringify(moveDetails)}`)
         return { name: "Unknown", dps: "0.00" }
       }
+    } catch (error) {
+      console.error(`Error fetching move details: ${error}`)
+      return { name: "Unknown", dps: "0.00" }
     }
-  )
+  }
 
-  fastMoves = await Promise.all(fastMovePromises)
+  // Fetch move details for each type of move
+  const [fastMoves, eliteFastMoves, chargedMoves, eliteChargedMoves] =
+    await Promise.all([
+      Promise.all(
+        pokemonMoves.fast_moves.map((element: string) =>
+          fetchMoveDetails(element, false)
+        )
+      ),
+      Promise.all(
+        pokemonMoves.elite_fast_moves.map((element: string) =>
+          fetchMoveDetails(element, false)
+        )
+      ),
+      Promise.all(
+        pokemonMoves.charged_moves.map((element: string) =>
+          fetchMoveDetails(element, true)
+        )
+      ),
+      Promise.all(
+        pokemonMoves.elite_charged_moves.map((element: string) =>
+          fetchMoveDetails(element, true)
+        )
+      ),
+    ])
+
+  // Update pokemonMoves object
   pokemonMoves.fast_moves = fastMoves
-
-  // Calculate DPS for charged moves
-  let chargedMoves = []
-  const chargedMovePromises = pokemonMoves.charged_moves.map(
-    async (element: string) => {
-      try {
-        let chargedMovesDetails = await getChargedMove(element)
-        if (
-          chargedMovesDetails &&
-          chargedMovesDetails.power &&
-          chargedMovesDetails.duration
-        ) {
-          chargedMovesDetails = {
-            name: chargedMovesDetails.name,
-            dps: (
-              (chargedMovesDetails.power / chargedMovesDetails.duration) *
-              1000
-            ).toFixed(2),
-            type: chargedMovesDetails.type,
-          }
-        } else {
-          // Handle invalid data
-          console.error(
-            `Invalid data for charged move: ${JSON.stringify(
-              chargedMovesDetails
-            )}`
-          )
-          chargedMovesDetails = { name: "Unknown", dps: "0.00" }
-        }
-
-        return chargedMovesDetails
-      } catch (error) {
-        // Handle errors from getChargedMove
-        console.error(`Error fetching charged move details: ${error}`)
-        return { name: "Unknown", dps: "0.00" }
-      }
-    }
-  )
-
-  chargedMoves = await Promise.all(chargedMovePromises)
+  pokemonMoves.elite_fast_moves = eliteFastMoves
   pokemonMoves.charged_moves = chargedMoves
+  pokemonMoves.elite_charged_moves = eliteChargedMoves
   return pokemonMoves
 }
 
@@ -237,7 +225,7 @@ async function getPokemonStats(pokemon_name: string) {
 
 async function findPokemonBuddy(pokemon_name: string) {
   try {
-    const response = await axios.get("${POGOAPI}/pokemon_buddy_distances.json")
+    const response = await axios.get(`${POGOAPI}/pokemon_buddy_distances.json`)
     return Object.values(response.data)
       .flat()
       .find(

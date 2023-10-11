@@ -15,8 +15,9 @@ export const PokemonWeatherBoosted: React.FC<PokemonWeatherBoostedProps> = ({
       const weatherCondition = weather[boost.toLowerCase()]
       list.push(
         <Image
+          key={boost}
           src={weatherCondition}
-            w={35}
+          w={35}
           fit="fill"
           alt="weather"
         ></Image>

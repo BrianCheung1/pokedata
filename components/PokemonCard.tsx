@@ -1,5 +1,5 @@
 import { capitalize } from "@/libs/utils"
-import { Card, Text, Skeleton, Grid, Title, Stack, Tabs } from "@mantine/core"
+import { Card, Text, Skeleton, Grid, Title, Stack, Tabs, Divider } from "@mantine/core"
 import { PokemonTypeVulnerable } from "./PokemonTypeVulnerable"
 import { PokemonTypeResistance } from "./PokemonTypeResistance"
 import { PokemonStats } from "./PokemonStats"
@@ -38,7 +38,7 @@ export const PokemonCard: React.FC<PokemonCardProps> = ({
               className="text-center"
             >{`"${pokemon?.pokemon_flavor_text}"`}</Text>
             <PokemonImages pokemon={pokemon} />
-            <hr className="h-px my-4 bg-gray-200 border-0 dark:bg-gray-700"></hr>
+            <Divider my="sm" variant="dashed" />
             <Grid justify="space-around" className="text-center">
               <Grid.Col span={3}>
                 <PokemonTypes pokemon={pokemon} />
@@ -53,7 +53,7 @@ export const PokemonCard: React.FC<PokemonCardProps> = ({
                 </Stack>
               </Grid.Col>
             </Grid>
-            <hr className="h-px my-4 bg-gray-200 border-0 dark:bg-gray-700"></hr>
+            <Divider my="sm" variant="dashed" />
             <Grid className="text-center">
               <Grid.Col span={6}>
                 <PokemonTypeResistance pokemon={pokemon} />
@@ -62,7 +62,7 @@ export const PokemonCard: React.FC<PokemonCardProps> = ({
                 <PokemonTypeVulnerable pokemon={pokemon} />
               </Grid.Col>
             </Grid>
-            <hr className="h-px my-4 bg-gray-200 border-0 dark:bg-gray-700"></hr>
+            <Divider my="sm" variant="dashed" />
             <PokemonStats pokemon={pokemon} />
           </Card>
         </Skeleton>
@@ -79,7 +79,7 @@ export const PokemonCard: React.FC<PokemonCardProps> = ({
               className="text-center"
             >{`"${pokemon?.pokemon_flavor_text}"`}</Text>
             <PokemonImages pokemon={pokemon} />
-            <hr className="h-px my-4 bg-gray-200 border-0 dark:bg-gray-700"></hr>
+            <Divider my="sm" variant="dashed" />
             <PokemonShiny pokemon={pokemon} />
           </Card>
         </Skeleton>
@@ -96,7 +96,7 @@ export const PokemonCard: React.FC<PokemonCardProps> = ({
               className="text-center"
             >{`"${pokemon?.pokemon_flavor_text}"`}</Text>
             <PokemonImages pokemon={pokemon} />
-            <hr className="h-px my-4 bg-gray-200 border-0 dark:bg-gray-700"></hr>
+            <Divider my="sm" variant="dashed" />
             <PokemonMoves pokemon={pokemon} />
           </Card>
         </Skeleton>

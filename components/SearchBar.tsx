@@ -1,14 +1,15 @@
 "use client"
 import { useState, useRef } from "react"
-import { Autocomplete } from "@mantine/core"
+import { Autocomplete, CloseButton, Container, Stack } from "@mantine/core"
 import useAllPokemons from "@/hooks/useAllPokemons"
-import { Container, Stack } from "@mantine/core"
 import { useRouter, usePathname } from "next/navigation"
-import { CloseButton } from '@mantine/core';
 
 export const SearchBar = () => {
   let currentPage = usePathname()
-  currentPage = currentPage.split("/").pop()?.replace(/[^a-zA-Z]/g, '') as string;
+  currentPage = currentPage
+    .split("/")
+    .pop()
+    ?.replace(/[^a-zA-Z]/g, "") as string
   const [value, setValue] = useState(currentPage)
   const { data: allPokemons = [], isLoading: isPokemonsLoading } =
     useAllPokemons()
@@ -35,13 +36,7 @@ export const SearchBar = () => {
               router.push(`/pokemons/${value}`)
             }}
             rightSection={
-              value && (
-                <CloseButton
-                  onClick={handleClear}
-                  className="cursor-pointer outline-none focus:outline-none"
-                >
-                </CloseButton>
-              )
+              value && <CloseButton onClick={handleClear}></CloseButton>
             }
           />
         </Stack>
@@ -72,12 +67,11 @@ export const SearchBar = () => {
           }}
           rightSection={
             value && (
-              <button
+              <CloseButton
                 onClick={handleClear}
                 className="cursor-pointer outline-none focus:outline-none"
               >
-                &#10006;
-              </button>
+              </CloseButton>
             )
           }
         />
