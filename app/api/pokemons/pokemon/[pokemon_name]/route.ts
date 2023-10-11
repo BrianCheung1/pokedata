@@ -3,6 +3,8 @@ import Axios from "axios"
 import { capitalize } from "@/libs/utils"
 import { setupCache } from "axios-cache-interceptor"
 const DEFAULT_CACHE_TIME = 5 * 60 * 1000
+const POGOAPI = "https://pogoapi.net/api/v1"
+const POKEAPI = "https://pokeapi.co/api/v2"
 
 //default cache time 5mins
 const axios = setupCache(Axios)
@@ -24,6 +26,7 @@ export async function GET(
       shiny,
       pokemon_weather_boosted,
       buddy_distance,
+      moves,
     ] = await Promise.all([
       findDualTypeDoubleDmgFrom(pokemon_name),
       findDualTypeDoubleDmgTo(pokemon_name),
@@ -34,6 +37,7 @@ export async function GET(
       getShiny(pokemon_name),
       findPokemonBoosted(pokemon_name),
       findPokemonBuddy(pokemon_name),
+      findAllMoves(pokemon_name),
     ])
 
     return NextResponse.json(
@@ -49,6 +53,7 @@ export async function GET(
         pokemon_flavor_text: pokemon_flavor_text,
         pokemon_weather_boosted: pokemon_weather_boosted,
         buddy_distance: buddy_distance,
+        moves: moves,
         sprite: `https://img.pokemondb.net/sprites/go/normal/${pokemon_name}.png`,
         sprite_shiny: `https://img.pokemondb.net/sprites/go/shiny/${pokemon_name}.png`,
       },
@@ -61,52 +66,147 @@ export async function GET(
 }
 
 async function getPokemonDetails(pokemonName: string) {
-  const response = await axios.get(
-    `https://pokeapi.co/api/v2/pokemon/${pokemonName}`
-  )
+  const response = await axios.get(`${POKEAPI}/pokemon/${pokemonName}`)
   return response.data
 }
 
 async function getFlavorTextEntries(pokemonName: string) {
-  const response = await axios.get(
-    `https://pokeapi.co/api/v2/pokemon-species/${pokemonName}`
-  )
+  const response = await axios.get(`${POKEAPI}/pokemon-species/${pokemonName}`)
   return response.data
 }
 
 async function getTypeDoubleDmgFrom(typeName: string) {
-  const response = await axios.get(`https://pokeapi.co/api/v2/type/${typeName}`)
+  const response = await axios.get(`${POKEAPI}/type/${typeName}`)
   return response.data.damage_relations.double_damage_from.map(
     (type: { name: string }) => capitalize(type.name)
   )
 }
 
 async function getTypeHalfDmgFrom(typeName: string) {
-  const response = await axios.get(`https://pokeapi.co/api/v2/type/${typeName}`)
+  const response = await axios.get(`${POKEAPI}/type/${typeName}`)
   return response.data.damage_relations.half_damage_from.map(
     (type: { name: string }) => capitalize(type.name)
   )
 }
 
 async function getTypeDoubleDmgTo(typeName: string) {
-  const response = await axios.get(`https://pokeapi.co/api/v2/type/${typeName}`)
+  const response = await axios.get(`${POKEAPI}/type/${typeName}`)
   return response.data.damage_relations.double_damage_to.map(
     (type: { name: string }) => type.name
   )
 }
 
 async function getTypeHalfDmgTo(typeName: string) {
-  const response = await axios.get(`https://pokeapi.co/api/v2/type/${typeName}`)
+  const response = await axios.get(`${POKEAPI}/type/${typeName}`)
   return response.data.damage_relations.double_damage_to.map(
     (type: { name: string }) => type.name
   )
 }
 
 async function getNoDmgFrom(typeName: string) {
-  const response = await axios.get(`https://pokeapi.co/api/v2/type/${typeName}`)
+  const response = await axios.get(`${POKEAPI}/type/${typeName}`)
   return response.data.damage_relations.no_damage_from.map(
     (type: { name: string }) => capitalize(type.name)
   )
+}
+
+async function getFastMove(moveName: string) {
+  const response = await axios.get(`${POGOAPI}/fast_moves.json`)
+  return response.data.find((move: { name: string }) => move.name === moveName)
+}
+
+async function getChargedMove(moveName: string) {
+  const response = await axios.get(`${POGOAPI}/charged_moves.json`)
+  return response.data.find((move: { name: string }) => move.name === moveName)
+}
+
+async function getCurrentMoves(pokemonName: string) {
+  const response = await axios.get(`${POGOAPI}/current_pokemon_moves.json`)
+  let pokemonMoves = response.data.find(
+    (pokemon: { pokemon_name: string; form: string }) =>
+      pokemon.pokemon_name.toLowerCase() === pokemonName &&
+      pokemon.form === "Normal"
+  )
+  let fastMoves = []
+  const fastMovePromises = pokemonMoves.fast_moves.map(
+    async (element: string) => {
+      try {
+        let fastMovesDetails = await getFastMove(element)
+
+        if (
+          fastMovesDetails &&
+          fastMovesDetails.power &&
+          fastMovesDetails.duration
+        ) {
+          fastMovesDetails = {
+            name: fastMovesDetails.name,
+            dps: (
+              (fastMovesDetails.power / fastMovesDetails.duration) *
+              1000
+            ).toFixed(2),
+            type: fastMovesDetails.type,
+          }
+        } else {
+          // Handle invalid data
+          console.error(
+            `Invalid data for fast move: ${JSON.stringify(fastMovesDetails)}`
+          )
+          fastMovesDetails = { name: "Unknown", dps: "0.00" }
+        }
+
+        return fastMovesDetails
+      } catch (error) {
+        // Handle errors from getFastMove
+        console.error(`Error fetching fast move details: ${error}`)
+        return { name: "Unknown", dps: "0.00" }
+      }
+    }
+  )
+
+  fastMoves = await Promise.all(fastMovePromises)
+  pokemonMoves.fast_moves = fastMoves
+
+  // Calculate DPS for charged moves
+  let chargedMoves = []
+  const chargedMovePromises = pokemonMoves.charged_moves.map(
+    async (element: string) => {
+      try {
+        let chargedMovesDetails = await getChargedMove(element)
+        if (
+          chargedMovesDetails &&
+          chargedMovesDetails.power &&
+          chargedMovesDetails.duration
+        ) {
+          chargedMovesDetails = {
+            name: chargedMovesDetails.name,
+            dps: (
+              (chargedMovesDetails.power / chargedMovesDetails.duration) *
+              1000
+            ).toFixed(2),
+            type: chargedMovesDetails.type,
+          }
+        } else {
+          // Handle invalid data
+          console.error(
+            `Invalid data for charged move: ${JSON.stringify(
+              chargedMovesDetails
+            )}`
+          )
+          chargedMovesDetails = { name: "Unknown", dps: "0.00" }
+        }
+
+        return chargedMovesDetails
+      } catch (error) {
+        // Handle errors from getChargedMove
+        console.error(`Error fetching charged move details: ${error}`)
+        return { name: "Unknown", dps: "0.00" }
+      }
+    }
+  )
+
+  chargedMoves = await Promise.all(chargedMovePromises)
+  pokemonMoves.charged_moves = chargedMoves
+  return pokemonMoves
 }
 
 function getPokemonTypes(pokemon: { types: { type: { name: string } }[] }) {
@@ -114,20 +214,14 @@ function getPokemonTypes(pokemon: { types: { type: { name: string } }[] }) {
 }
 
 async function getShiny(pokemon_name: string) {
-  const response = await axios.get(
-    `https://pogoapi.net/api/v1/shiny_pokemon.json`
-  )
+  const response = await axios.get(`${POGOAPI}/shiny_pokemon.json`)
   const pokemon_details = await getPokemonDetails(pokemon_name)
   return response.data[Number(pokemon_details.id)]
 }
 
 async function getPokemonStats(pokemon_name: string) {
-  const response = await axios.get(
-    `https://pogoapi.net/api/v1/pokemon_stats.json`
-  )
-  const response2 = await axios.get(
-    `https://pogoapi.net/api/v1/pokemon_max_cp.json`
-  )
+  const response = await axios.get(`${POGOAPI}/pokemon_stats.json`)
+  const response2 = await axios.get(`${POGOAPI}/pokemon_max_cp.json`)
   let stats = response.data.find(
     (pokemon: { pokemon_name: string; form: string }) =>
       pokemon.pokemon_name.toLowerCase() === pokemon_name &&
@@ -143,9 +237,7 @@ async function getPokemonStats(pokemon_name: string) {
 
 async function findPokemonBuddy(pokemon_name: string) {
   try {
-    const response = await axios.get(
-      "https://pogoapi.net/api/v1/pokemon_buddy_distances.json"
-    )
+    const response = await axios.get("${POGOAPI}/pokemon_buddy_distances.json")
     return Object.values(response.data)
       .flat()
       .find(
@@ -163,9 +255,7 @@ async function findPokemonBuddy(pokemon_name: string) {
 
 async function findPokemonBoosted(pokemonName: string) {
   try {
-    const response = await axios.get(
-      `https://pogoapi.net/api/v1/weather_boosts.json`
-    )
+    const response = await axios.get(`${POGOAPI}/weather_boosts.json`)
     const pokemonDetails = await getPokemonDetails(pokemonName)
     const pokemonTypes = await getPokemonTypes(pokemonDetails)
     const [type1, type2] = pokemonTypes
@@ -317,6 +407,18 @@ async function findFlavorText(pokemonName: string) {
   } catch (error) {
     return NextResponse.json(
       { msg: "findFlavorText error", error },
+      { status: 500 }
+    )
+  }
+}
+
+async function findAllMoves(pokemonName: string) {
+  try {
+    let pokemonMoves = await getCurrentMoves(pokemonName)
+    return pokemonMoves
+  } catch (error) {
+    return NextResponse.json(
+      { msg: "findAllMoves error", error },
       { status: 500 }
     )
   }

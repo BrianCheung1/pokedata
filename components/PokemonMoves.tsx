@@ -6,7 +6,7 @@ interface PokemonMoves {
 }
 
 export const PokemonMoves: React.FC<PokemonMoves> = ({
-  pokemon: { type_effectiveness },
+  pokemon: { type_effectiveness, moves },
 }) => {
   const renderTypeEffectiveness = () => {
     const list = []
@@ -20,10 +20,21 @@ export const PokemonMoves: React.FC<PokemonMoves> = ({
             </Title>
           </Grid.Col>
         )
+      if (type_effectiveness[key].length === 0) {
+        list.push(
+          <Grid.Col>
+            <Text size="md" c="dimmed" key={key + type_effectiveness[key]}>
+              N/A
+            </Text>
+          </Grid.Col>
+        )
+      }
       for (const key2 in type_effectiveness[key]) {
         list.push(
           <Grid.Col>
-            <Text size="md" c="dimmed"
+            <Text
+              size="md"
+              c="dimmed"
               key={key + key2 + type_effectiveness[key][key2]}
             >{`Effective against ${type_effectiveness[key][key2]} types`}</Text>
           </Grid.Col>
@@ -33,9 +44,33 @@ export const PokemonMoves: React.FC<PokemonMoves> = ({
     return list
   }
 
+  const renderMoves = () => {
+    const list: any[] = []
+
+    list.push(<Grid.Col>Fast Moves</Grid.Col>)
+    moves?.fast_moves?.map((move:any) => {
+      list.push(
+        <Grid.Col>
+          Move Name: {move.name} Dps: {move.dps} Type: {move.type}
+        </Grid.Col>
+      )
+    })
+    list.push(<Grid.Col>Charged Moves</Grid.Col>)
+    moves?.charged_moves?.map((move:any) => {
+      list.push(
+        <Grid.Col>
+          Move Name: {move.name} Dps: {move.dps} Type: {move.type}
+        </Grid.Col>
+      )
+    })
+
+    return list
+  }
   return (
     <>
-      <Grid>{renderTypeEffectiveness()}</Grid>
+      <Grid>
+        {renderTypeEffectiveness()} {renderMoves()}
+      </Grid>
     </>
   )
 }
