@@ -1,5 +1,14 @@
 import { capitalize } from "@/libs/utils"
-import { Card, Text, Skeleton, Grid, Title, Stack, Tabs, Divider } from "@mantine/core"
+import {
+  Card,
+  Text,
+  Skeleton,
+  Grid,
+  Title,
+  Stack,
+  Tabs,
+  Divider,
+} from "@mantine/core"
 import { PokemonTypeVulnerable } from "./PokemonTypeVulnerable"
 import { PokemonTypeResistance } from "./PokemonTypeResistance"
 import { PokemonStats } from "./PokemonStats"
@@ -8,6 +17,7 @@ import { PokemonImages } from "./PokemonImages"
 import { PokemonTypes } from "./PokemonTypes"
 import { PokemonWeatherBoosted } from "./PokemonWeatherBoosted"
 import { PokemonMoves } from "./PokemonMoves"
+import { PokemonEvolutions } from "./PokemonEvolutions"
 
 interface PokemonCardProps {
   pokemon: Record<string, any>
@@ -24,6 +34,7 @@ export const PokemonCard: React.FC<PokemonCardProps> = ({
         <Tabs.Tab value="details">Details</Tabs.Tab>
         <Tabs.Tab value="shiny">Shiny Rates</Tabs.Tab>
         <Tabs.Tab value="moves">Moves</Tabs.Tab>
+        <Tabs.Tab value="evolutions">Evolutions</Tabs.Tab>
       </Tabs.List>
 
       <Tabs.Panel value="details">
@@ -98,6 +109,23 @@ export const PokemonCard: React.FC<PokemonCardProps> = ({
             <PokemonImages pokemon={pokemon} />
             <Divider my="sm" variant="dashed" />
             <PokemonMoves pokemon={pokemon} />
+          </Card>
+        </Skeleton>
+      </Tabs.Panel>
+      <Tabs.Panel value="evolutions">
+        <Skeleton visible={isLoading}>
+          <Card shadow="sm" padding="lg" radius="md" withBorder>
+            <Title className="text-center" order={1}>
+              {capitalize(pokemon?.pokemon_name)}
+            </Title>
+            <Text
+              size="xs"
+              c="dimmed"
+              className="text-center"
+            >{`"${pokemon?.pokemon_flavor_text}"`}</Text>
+            <PokemonImages pokemon={pokemon} />
+            <Divider my="sm" variant="dashed" />
+            <PokemonEvolutions pokemon={pokemon} />
           </Card>
         </Skeleton>
       </Tabs.Panel>

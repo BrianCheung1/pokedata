@@ -11,7 +11,7 @@ export default function PokemonName() {
   const { data: pokemon = [], isLoading } = usePokemon(pokemon_name as string)
 
   return (
-    <Container fluid className="overflow-hidden w-full md:w-2/3 lg:w-1/2">
+    <Container fluid className="overflow-hidden w-full md:w-3/4 lg:w-1/2">
       <ColorSchemeToggle />
       <div className="mb-2">
         <SearchBar />

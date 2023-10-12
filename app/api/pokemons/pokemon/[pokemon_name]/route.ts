@@ -27,6 +27,7 @@ export async function GET(
       pokemon_weather_boosted,
       buddy_distance,
       moves,
+      evolution_family,
     ] = await Promise.all([
       findDualTypeDoubleDmgFrom(pokemon_name),
       findDualTypeDoubleDmgTo(pokemon_name),
@@ -38,6 +39,7 @@ export async function GET(
       findPokemonBoosted(pokemon_name),
       findPokemonBuddy(pokemon_name),
       findAllMoves(pokemon_name),
+      findEvolutionFamily(pokemon_name),
     ])
 
     return NextResponse.json(
@@ -54,6 +56,7 @@ export async function GET(
         pokemon_weather_boosted: pokemon_weather_boosted,
         buddy_distance: buddy_distance,
         moves: moves,
+        evolution_family: evolution_family,
         sprite: `https://img.pokemondb.net/sprites/go/normal/${pokemon_name}.png`,
         sprite_shiny: `https://img.pokemondb.net/sprites/go/shiny/${pokemon_name}.png`,
       },
@@ -118,6 +121,33 @@ async function getFastMove(moveName: string) {
 async function getChargedMove(moveName: string) {
   const response = await axios.get(`${POGOAPI}/charged_moves.json`)
   return response.data.find((move: { name: string }) => move.name === moveName)
+}
+
+async function getEvolutions(pokemonName: string) {
+  const response = await axios.get(`${POKEAPI}/pokemon-species/${pokemonName}`)
+  const response2 = await axios.get(response.data.evolution_chain.url)
+  function getAllEvolutions(evolutionChain: { chain: any }) {
+    const evolutions: { name: any; sprite: any }[] = []
+
+    async function traverseChain(chain: { species: any; evolves_to: any }) {
+      const currentSpecies = chain.species
+      evolutions.push({
+        name: currentSpecies.name,
+        sprite: `https://img.pokemondb.net/sprites/go/normal/${currentSpecies.name}.png`,
+      })
+
+      if (chain.evolves_to) {
+        for (const evolution of chain.evolves_to) {
+          traverseChain(evolution)
+        }
+      }
+    }
+
+    traverseChain(evolutionChain.chain)
+    return evolutions
+  }
+
+  return getAllEvolutions(response2.data)
 }
 
 async function getCurrentMoves(pokemonName: string) {
@@ -431,6 +461,18 @@ async function findAllMoves(pokemonName: string) {
   } catch (error) {
     return NextResponse.json(
       { msg: "findAllMoves error", error },
+      { status: 500 }
+    )
+  }
+}
+
+async function findEvolutionFamily(pokemonName: string) {
+  try {
+    const pokemonEvolution = await getEvolutions(pokemonName)
+    return pokemonEvolution
+  } catch (error) {
+    return NextResponse.json(
+      { msg: "findEvolutionFamily error", error },
       { status: 500 }
     )
   }

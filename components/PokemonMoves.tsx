@@ -118,7 +118,6 @@ export const PokemonMoves: React.FC<PokemonMoves> = ({
 
   return (
     <Table.ScrollContainer minWidth={500}>
-      {/* {renderTypeEffectiveness()}  */}
       <Table
         horizontalSpacing="md"
         withColumnBorders
