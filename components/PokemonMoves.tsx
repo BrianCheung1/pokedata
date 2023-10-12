@@ -44,8 +44,8 @@ export const PokemonMoves: React.FC<PokemonMoves> = ({
     return list
   }
 
-  const renderFastMoves = moves?.fast_moves?.map((move: any) => (
-    <Table.Tr key={move.name}>
+  const renderFastMoves = moves?.fast_moves?.map((move: any, index: number) => (
+    <Table.Tr key={move.name} style={index === 0 ? { backgroundColor: '#555' } : {}}>
       <Table.Td>{move.name}</Table.Td>
       <Table.Td>{move.dps}</Table.Td>
       <Table.Td>{move.dpe}</Table.Td>
@@ -57,8 +57,8 @@ export const PokemonMoves: React.FC<PokemonMoves> = ({
 
   const renderEliteFastMoves =
     moves?.fast_charged_moves?.length > 0 ? (
-      moves?.elite_fast_moves?.map((move: any) => (
-        <Table.Tr key={move.name}>
+      moves?.elite_fast_moves?.map((move: any, index: number) => (
+        <Table.Tr key={move.name} style={index === 0 ? { backgroundColor: '#555' } : {}}>
           <Table.Td>{move.name}</Table.Td>
           <Table.Td>{move.dps}</Table.Td>
           <Table.Td>{move.dpe}</Table.Td>
@@ -73,8 +73,8 @@ export const PokemonMoves: React.FC<PokemonMoves> = ({
       </Table.Tr>
     )
 
-  const renderChargedMoves = moves?.charged_moves?.map((move: any) => (
-    <Table.Tr key={move.name}>
+  const renderChargedMoves = moves?.charged_moves?.map((move: any , index: number) => (
+    <Table.Tr key={move.name} style={index === 0 ? { backgroundColor: '#555' } : {}}>
       <Table.Td>{move.name}</Table.Td>
       <Table.Td>{move.dps}</Table.Td>
       <Table.Td>{move.dpe}</Table.Td>
@@ -86,8 +86,8 @@ export const PokemonMoves: React.FC<PokemonMoves> = ({
 
   const renderEliteChargedMoves =
     moves?.elite_charged_moves.length > 0 ? (
-      moves?.elite_charged_moves?.map((move: any) => (
-        <Table.Tr key={move.name}>
+      moves?.elite_charged_moves?.map((move: any, index: number) => (
+        <Table.Tr key={move.name} style={index === 0 ? { backgroundColor: '#555' } : {}}>
           <Table.Td>{move.name}</Table.Td>
           <Table.Td>{move.dps}</Table.Td>
           <Table.Td>{move.dpe}</Table.Td>
@@ -105,9 +105,9 @@ export const PokemonMoves: React.FC<PokemonMoves> = ({
   return (
     <Table.ScrollContainer minWidth={500}>
       {/* {renderTypeEffectiveness()}  */}
-      <Table horizontalSpacing="md" withColumnBorders>
-        <Table.Thead>
-          <Table.Tr>
+      <Table horizontalSpacing="md" withColumnBorders >
+        <Table.Thead >
+          <Table.Tr >
             <Table.Th>Fast Moves</Table.Th>
           </Table.Tr>
           <Table.Tr>
@@ -119,13 +119,13 @@ export const PokemonMoves: React.FC<PokemonMoves> = ({
             <Table.Th>Move type</Table.Th>
           </Table.Tr>
         </Table.Thead>
-        <Table.Tbody>{renderFastMoves}</Table.Tbody>
+        <Table.Tbody >{renderFastMoves}</Table.Tbody>
         <Table.Thead>
           <Table.Tr>
             <Table.Th>Elite Fast Moves</Table.Th>
           </Table.Tr>
         </Table.Thead>
-        <Table.Tbody>{renderEliteFastMoves}</Table.Tbody>
+        <Table.Tbody >{renderEliteFastMoves}</Table.Tbody>
         <Table.Thead>
           <Table.Tr>
             <Table.Th>Charged Moves</Table.Th>

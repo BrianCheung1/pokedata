@@ -121,13 +121,16 @@ async function getChargedMove(moveName: string) {
 }
 
 async function getCurrentMoves(pokemonName: string) {
-  const response = await axios.get(`${POGOAPI}/current_pokemon_moves.json`)
-  let pokemonMoves = response.data.find(
+  const cacheBuster = new Date().getTime()
+  const response = await axios.get(
+    `${POGOAPI}/current_pokemon_moves.json?cacheBuster=${cacheBuster}  `
+  )
+  const pokemonMoves = response.data.find(
     (pokemon: { pokemon_name: string; form: string }) =>
       pokemon.pokemon_name.toLowerCase() === pokemonName &&
       pokemon.form === "Normal"
   )
-  if (response.cached) return pokemonMoves
+  console.log(response.cached, pokemonMoves)
   // Helper function to handle move details retrieval
   const fetchMoveDetails = async (moveName: string, isCharged: boolean) => {
     try {
@@ -190,10 +193,12 @@ async function getCurrentMoves(pokemonName: string) {
     ])
 
   // Update pokemonMoves object
-  pokemonMoves.fast_moves = fastMoves
-  pokemonMoves.elite_fast_moves = eliteFastMoves
-  pokemonMoves.charged_moves = chargedMoves
-  pokemonMoves.elite_charged_moves = eliteChargedMoves
+  pokemonMoves.fast_moves = fastMoves.sort((a, b) => b.eps - a.eps)
+  pokemonMoves.elite_fast_moves = eliteFastMoves.sort((a, b) => b.eps - a.eps)
+  pokemonMoves.charged_moves = chargedMoves.sort((a, b) => b.total - a.total)
+  pokemonMoves.elite_charged_moves = eliteChargedMoves.sort(
+    (a, b) => b.total - a.total
+  )
   return pokemonMoves
 }
 
