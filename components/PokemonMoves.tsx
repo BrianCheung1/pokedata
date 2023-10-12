@@ -1,4 +1,4 @@
-import { Text, Grid, Image, Badge, Title, Table } from "@mantine/core"
+import { Text, Grid, Image, Badge, Title, Table, Tooltip } from "@mantine/core"
 import { capitalize } from "@/libs/utils"
 
 interface PokemonMoves {
@@ -45,7 +45,10 @@ export const PokemonMoves: React.FC<PokemonMoves> = ({
   }
 
   const renderFastMoves = moves?.fast_moves?.map((move: any, index: number) => (
-    <Table.Tr key={move.name} style={index === 0 ? { backgroundColor: '#555' } : {}}>
+    <Table.Tr
+      key={move.name}
+      style={index === 0 ? { backgroundColor: "#555" } : {}}
+    >
       <Table.Td>{move.name}</Table.Td>
       <Table.Td>{move.dps}</Table.Td>
       <Table.Td>{move.dpe}</Table.Td>
@@ -56,9 +59,12 @@ export const PokemonMoves: React.FC<PokemonMoves> = ({
   ))
 
   const renderEliteFastMoves =
-    moves?.fast_charged_moves?.length > 0 ? (
+    moves?.elite_fast_moves?.length > 0 ? (
       moves?.elite_fast_moves?.map((move: any, index: number) => (
-        <Table.Tr key={move.name} style={index === 0 ? { backgroundColor: '#555' } : {}}>
+        <Table.Tr
+          key={move.name}
+          style={index === 0 ? { backgroundColor: "#555" } : {}}
+        >
           <Table.Td>{move.name}</Table.Td>
           <Table.Td>{move.dps}</Table.Td>
           <Table.Td>{move.dpe}</Table.Td>
@@ -73,21 +79,29 @@ export const PokemonMoves: React.FC<PokemonMoves> = ({
       </Table.Tr>
     )
 
-  const renderChargedMoves = moves?.charged_moves?.map((move: any , index: number) => (
-    <Table.Tr key={move.name} style={index === 0 ? { backgroundColor: '#555' } : {}}>
-      <Table.Td>{move.name}</Table.Td>
-      <Table.Td>{move.dps}</Table.Td>
-      <Table.Td>{move.dpe}</Table.Td>
-      <Table.Td>{move.eps}</Table.Td>
-      <Table.Td>{move.total}</Table.Td>
-      <Table.Td>{move.type}</Table.Td>
-    </Table.Tr>
-  ))
+  const renderChargedMoves = moves?.charged_moves?.map(
+    (move: any, index: number) => (
+      <Table.Tr
+        key={move.name}
+        style={index === 0 ? { backgroundColor: "#555" } : {}}
+      >
+        <Table.Td>{move.name}</Table.Td>
+        <Table.Td>{move.dps}</Table.Td>
+        <Table.Td>{move.dpe}</Table.Td>
+        <Table.Td>{move.eps}</Table.Td>
+        <Table.Td>{move.total}</Table.Td>
+        <Table.Td>{move.type}</Table.Td>
+      </Table.Tr>
+    )
+  )
 
   const renderEliteChargedMoves =
     moves?.elite_charged_moves.length > 0 ? (
       moves?.elite_charged_moves?.map((move: any, index: number) => (
-        <Table.Tr key={move.name} style={index === 0 ? { backgroundColor: '#555' } : {}}>
+        <Table.Tr
+          key={move.name}
+          style={index === 0 ? { backgroundColor: "#555" } : {}}
+        >
           <Table.Td>{move.name}</Table.Td>
           <Table.Td>{move.dps}</Table.Td>
           <Table.Td>{move.dpe}</Table.Td>
@@ -105,9 +119,20 @@ export const PokemonMoves: React.FC<PokemonMoves> = ({
   return (
     <Table.ScrollContainer minWidth={500}>
       {/* {renderTypeEffectiveness()}  */}
-      <Table horizontalSpacing="md" withColumnBorders >
-        <Table.Thead >
-          <Table.Tr >
+      <Table
+        horizontalSpacing="md"
+        withColumnBorders
+        captionSide="bottom"
+        highlightOnHover
+      >
+        <Table.Caption>Highlighted Rows are the best moves </Table.Caption>
+        <Table.Caption>
+          DPS - Damage Per Second - 20% Extra DPS if same type
+        </Table.Caption>
+        <Table.Caption>DPE - Damage Per Energy</Table.Caption>
+        <Table.Caption>EPS - Energy Per Second</Table.Caption>
+        <Table.Thead>
+          <Table.Tr>
             <Table.Th>Fast Moves</Table.Th>
           </Table.Tr>
           <Table.Tr>
@@ -119,13 +144,13 @@ export const PokemonMoves: React.FC<PokemonMoves> = ({
             <Table.Th>Move type</Table.Th>
           </Table.Tr>
         </Table.Thead>
-        <Table.Tbody >{renderFastMoves}</Table.Tbody>
+        <Table.Tbody>{renderFastMoves}</Table.Tbody>
         <Table.Thead>
           <Table.Tr>
             <Table.Th>Elite Fast Moves</Table.Th>
           </Table.Tr>
         </Table.Thead>
-        <Table.Tbody >{renderEliteFastMoves}</Table.Tbody>
+        <Table.Tbody>{renderEliteFastMoves}</Table.Tbody>
         <Table.Thead>
           <Table.Tr>
             <Table.Th>Charged Moves</Table.Th>

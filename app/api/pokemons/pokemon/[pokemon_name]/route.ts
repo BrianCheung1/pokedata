@@ -121,27 +121,30 @@ async function getChargedMove(moveName: string) {
 }
 
 async function getCurrentMoves(pokemonName: string) {
-  const cacheBuster = new Date().getTime()
-  const response = await axios.get(
-    `${POGOAPI}/current_pokemon_moves.json?cacheBuster=${cacheBuster}  `
-  )
+  const response = await axios.get(`${POGOAPI}/current_pokemon_moves.json? `)
+  const pokemonDetails = await getPokemonDetails(pokemonName)
+  const pokemonTypes = await getPokemonTypes(pokemonDetails)
   const pokemonMoves = response.data.find(
     (pokemon: { pokemon_name: string; form: string }) =>
       pokemon.pokemon_name.toLowerCase() === pokemonName &&
       pokemon.form === "Normal"
   )
-  console.log(response.cached, pokemonMoves)
+  console.log(pokemonMoves)
+  if (pokemonMoves.cached) return pokemonMoves
   // Helper function to handle move details retrieval
   const fetchMoveDetails = async (moveName: string, isCharged: boolean) => {
     try {
       const moveDetails = (await isCharged)
         ? await getChargedMove(moveName)
         : await getFastMove(moveName)
-
       if (moveDetails && moveDetails.power && moveDetails.duration) {
         return {
           name: moveDetails.name,
-          dps: ((moveDetails.power / moveDetails.duration) * 1000).toFixed(2),
+          dps: pokemonTypes.includes(moveDetails.type.toLowerCase())
+            ? ((moveDetails.power / moveDetails.duration) * 1.2 * 1000).toFixed(
+                2
+              )
+            : ((moveDetails.power / moveDetails.duration) * 1000).toFixed(2),
           dpe: Math.abs(moveDetails.power / moveDetails.energy_delta).toFixed(
             2
           ),
@@ -150,11 +153,26 @@ async function getCurrentMoves(pokemonName: string) {
             1000
           ).toFixed(2),
 
-          total: (
-            (moveDetails.power / moveDetails.duration) *
-            1000 *
-            Math.abs(moveDetails.power / moveDetails.energy_delta)
+          total: pokemonTypes.includes(moveDetails.type.toLowerCase())
+            ? (
+                (moveDetails.power / moveDetails.duration) *
+                1.2 *
+                1000 *
+                Math.abs(moveDetails.power / moveDetails.energy_delta)
+              ).toFixed(2)
+            : ((moveDetails.power / moveDetails.duration) * 1000).toFixed(2),
+          type: moveDetails.type,
+        }
+      } else if (moveDetails.power === 0) {
+        return {
+          name: moveDetails.name,
+          dps: 0.0,
+          eps: (
+            (moveDetails.energy_delta / moveDetails.duration) *
+            1000
           ).toFixed(2),
+          dpe: 0.0,
+          total: 0.0,
           type: moveDetails.type,
         }
       } else {
@@ -199,6 +217,7 @@ async function getCurrentMoves(pokemonName: string) {
   pokemonMoves.elite_charged_moves = eliteChargedMoves.sort(
     (a, b) => b.total - a.total
   )
+  pokemonMoves.cached = true
   return pokemonMoves
 }
 
