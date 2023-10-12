@@ -3,6 +3,7 @@ import { useState, useRef } from "react"
 import { Autocomplete, CloseButton, Container, Stack } from "@mantine/core"
 import useAllPokemons from "@/hooks/useAllPokemons"
 import { useRouter, usePathname } from "next/navigation"
+import { CopyURL } from "./CopyURL"
 
 export const SearchBar = () => {
   let currentPage = usePathname()
@@ -35,6 +36,9 @@ export const SearchBar = () => {
             onOptionSubmit={(value) => {
               router.push(`/pokemons/${value}`)
             }}
+            leftSection={
+              <CopyURL/>
+            }
             rightSection={
               value && <CloseButton onClick={handleClear}></CloseButton>
             }
@@ -65,13 +69,15 @@ export const SearchBar = () => {
           onOptionSubmit={(value) => {
             router.push(`/pokemons/${value}`)
           }}
+          leftSection={
+            <CopyURL/>
+          }
           rightSection={
             value && (
               <CloseButton
                 onClick={handleClear}
                 className="cursor-pointer outline-none focus:outline-none"
-              >
-              </CloseButton>
+              ></CloseButton>
             )
           }
         />

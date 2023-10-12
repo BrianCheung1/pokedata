@@ -196,13 +196,13 @@ async function getCurrentMoves(pokemonName: string) {
       } else if (moveDetails.power === 0) {
         return {
           name: moveDetails.name,
-          dps: 0.0,
+          dps: "0.00",
           eps: (
             (moveDetails.energy_delta / moveDetails.duration) *
             1000
           ).toFixed(2),
-          dpe: 0.0,
-          total: 0.0,
+          dpe: "0.00",
+          total: "0.00",
           type: moveDetails.type,
         }
       } else {
