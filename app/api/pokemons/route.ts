@@ -7,7 +7,7 @@ export async function GET(req: Request) {
       "https://pogoapi.net/api/v1/pokemon_types.json"
     )
 
-    pokemons = pokemons.data.filter((pokemon)=> {
+    pokemons = pokemons.data.filter((pokemon: { form: string })=> {
       return pokemon.form === "Normal"
     })
 

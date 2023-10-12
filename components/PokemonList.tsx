@@ -18,10 +18,12 @@ export const PokemonList = () => {
     useAllPokemons()
   const router = useRouter()
 
-  const renderPokemons = allPokemons?.pokemons?.map((pokemon) => (
+  const renderPokemons = allPokemons?.pokemons?.map((pokemon: any) => (
     <Card
       onClick={() =>
-        router.push(`/pokemons/${pokemon.pokemon_name.replace(/[^a-zA-Z]/g, "")}`)
+        router.push(
+          `/pokemons/${pokemon.pokemon_name.replace(/[^a-zA-Z]/g, "")}`
+        )
       }
       className="cursor-pointer mb-2"
       radius="md"
