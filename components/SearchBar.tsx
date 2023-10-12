@@ -22,7 +22,7 @@ export const SearchBar = () => {
 
   if (isPokemonsLoading) {
     return (
-      <Container fluid className="mt-5 flex items-center justify-center">
+      <Container fluid className="mt-5 flex items-center justify-center pb-5">
         <Stack className="w-full md:w-2/3 lg:w-1/2">
           <Autocomplete
             value={value}
@@ -49,7 +49,7 @@ export const SearchBar = () => {
   }
 
   return (
-    <Container fluid className="mt-5 flex items-center justify-center">
+    <Container fluid className="mt-5 flex items-center justify-center pb-5">
       <Stack className="w-full md:w-2/3 lg:w-1/2">
         <Autocomplete
           value={value}
@@ -59,7 +59,7 @@ export const SearchBar = () => {
             isPokemonsLoading
               ? []
               : allPokemons?.pokemons?.map(
-                  (pokemon: { name: any }) => pokemon.name
+                  (pokemon: { pokemon_name: any }) => pokemon.pokemon_name
                 )
           }
           onChange={(value) => {

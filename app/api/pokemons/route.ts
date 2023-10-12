@@ -1,21 +1,26 @@
 import axios from "axios"
 import { NextResponse } from "next/server"
-import { setupCache } from "axios-cache-interceptor"
 
 export async function GET(req: Request) {
   try {
-    const pokemons = await axios.get(
-      "https://pogoapi.net//api/v1/released_pokemon.json"
+    let pokemons = await axios.get(
+      "https://pogoapi.net/api/v1/pokemon_types.json"
     )
+
+    pokemons = pokemons.data.filter((pokemon)=> {
+      return pokemon.form === "Normal"
+    })
+
+    console.log(pokemons)
 
     return NextResponse.json(
       {
         msg: "Success",
-        pokemons: Object.values(pokemons.data),
+        pokemons: pokemons,
       },
       { status: 200 }
     )
   } catch (error) {
-    return NextResponse.json({ msg: error }, { status: 500 })
+    return NextResponse.json({ msg: "Error in Pokemons GET", error }, { status: 500 })
   }
 }
