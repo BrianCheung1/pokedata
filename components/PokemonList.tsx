@@ -22,7 +22,7 @@ export const PokemonList = () => {
     <Card bg={darken(colors[pokemon.type[0].toLowerCase()], 0.7)}
       onClick={() =>
         router.push(
-          `/pokemons/${pokemon.pokemon_name.replace(/[^a-zA-Z]/g, "")}`
+          `/pokemons/${pokemon.pokemon_name}`
         )
       }
       className="cursor-pointer mb-2"
@@ -49,7 +49,7 @@ export const PokemonList = () => {
   ))
 
   return (
-    <ScrollArea h={800} type="auto">
+    <ScrollArea h={850} type="auto">
       {renderPokemons}
     </ScrollArea>
   )

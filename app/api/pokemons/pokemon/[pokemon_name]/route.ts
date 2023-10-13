@@ -7,7 +7,7 @@ const POGOAPI = "https://pogoapi.net/api/v1"
 const POKEAPI = "https://pokeapi.co/api/v2"
 
 //default cache time 5mins
-const axios = setupCache(Axios)
+const axios = setupCache( Axios)
 
 export async function GET(
   req: Request,

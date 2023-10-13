@@ -5,10 +5,10 @@ import { NavBar } from "@/components/NavBar"
 
 export default function Home() {
   return (
-    <Container fluid className="h-screen overflow-hidden">
+    <Container fluid className="bg-black">
       <NavBar />
       <Flex
-        className="h-full"
+        className="h-[calc(100vh-50px)] "
         justify="center"
         align="center"
         direction="column"
