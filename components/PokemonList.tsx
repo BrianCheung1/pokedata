@@ -2,16 +2,16 @@
 import useAllPokemons from "@/hooks/useAllPokemons"
 import {
   Card,
-  Image,
   Text,
-  Badge,
-  Button,
-  Group,
   ScrollArea,
-  Stack,
   Flex,
+  Badge,
+  Group,
+  darken
 } from "@mantine/core"
 import { useRouter } from "next/navigation"
+import { colors } from "@/libs/utils"
+
 
 export const PokemonList = () => {
   const { data: allPokemons = [], isLoading: isPokemonsLoading } =
@@ -19,7 +19,7 @@ export const PokemonList = () => {
   const router = useRouter()
 
   const renderPokemons = allPokemons?.pokemons?.map((pokemon: any) => (
-    <Card
+    <Card bg={darken(colors[pokemon.type[0].toLowerCase()], 0.7)}
       onClick={() =>
         router.push(
           `/pokemons/${pokemon.pokemon_name.replace(/[^a-zA-Z]/g, "")}`
@@ -30,22 +30,26 @@ export const PokemonList = () => {
       withBorder
       key={pokemon.pokemon_name}
     >
-      <Flex gap="sm" align="center">
+      <Flex gap="sm" align="center" className="">
         <Flex direction="column">
           <Text fw={500}>{pokemon.pokemon_name}</Text>
           <Text size="xs" c="dimmed">
             #{pokemon.pokemon_id}
           </Text>
         </Flex>
-        <Badge color="pink" variant="light" className="ml-auto">
-          {pokemon.type.join(",")}
-        </Badge>
+        <Group className="ml-auto" gap="xs">
+          {pokemon?.type?.map((type: string) => (
+            <Badge key={type} color={colors[type.toLowerCase()]}>
+              {type}
+            </Badge>
+          ))}
+        </Group>
       </Flex>
     </Card>
   ))
 
   return (
-    <ScrollArea h={750} type="auto">
+    <ScrollArea h={800} type="auto">
       {renderPokemons}
     </ScrollArea>
   )

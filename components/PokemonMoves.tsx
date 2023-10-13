@@ -6,43 +6,8 @@ interface PokemonMoves {
 }
 
 export const PokemonMoves: React.FC<PokemonMoves> = ({
-  pokemon: { type_effectiveness, moves },
+  pokemon: { moves },
 }) => {
-  const renderTypeEffectiveness = () => {
-    const list = []
-
-    for (const key in type_effectiveness) {
-      if (key)
-        list.push(
-          <Grid.Col>
-            <Title order={5} key={type_effectiveness[key]}>
-              {`${capitalize(key)} Moves`}:
-            </Title>
-          </Grid.Col>
-        )
-      if (type_effectiveness[key].length === 0) {
-        list.push(
-          <Grid.Col>
-            <Text size="md" c="dimmed" key={key + type_effectiveness[key]}>
-              N/A
-            </Text>
-          </Grid.Col>
-        )
-      }
-      for (const key2 in type_effectiveness[key]) {
-        list.push(
-          <Grid.Col>
-            <Text
-              size="md"
-              c="dimmed"
-              key={key + key2 + type_effectiveness[key][key2]}
-            >{`Effective against ${type_effectiveness[key][key2]} types`}</Text>
-          </Grid.Col>
-        )
-      }
-    }
-    return list
-  }
 
   const renderFastMoves = moves?.fast_moves?.map((move: any, index: number) => (
     <Table.Tr

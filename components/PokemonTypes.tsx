@@ -1,4 +1,4 @@
-import { Text, Badge, Title, Stack } from "@mantine/core"
+import { Text, Badge, Title, Stack, Group } from "@mantine/core"
 import { colors } from "@/libs/utils"
 
 interface PokemonTypesProps {
@@ -12,10 +12,7 @@ export const PokemonTypes: React.FC<PokemonTypesProps> = ({
     const list = []
     for (const types in pokemon_types) {
       list.push(
-        <Badge
-          key={types}
-          color={colors[pokemon_types[types]]}
-        >
+        <Badge key={types} color={colors[pokemon_types[types]]}>
           {pokemon_types[types]}
         </Badge>
       )
@@ -26,7 +23,7 @@ export const PokemonTypes: React.FC<PokemonTypesProps> = ({
   return (
     <Stack justify="center" align="center">
       <Title order={5}>Type</Title>
-      <Text>{renderTypes()}</Text>
+      <Group gap="xs" justify="center" align="center">{renderTypes()}</Group>
     </Stack>
   )
 }

@@ -18,6 +18,7 @@ import { PokemonTypes } from "./PokemonTypes"
 import { PokemonWeatherBoosted } from "./PokemonWeatherBoosted"
 import { PokemonMoves } from "./PokemonMoves"
 import { PokemonEvolutions } from "./PokemonEvolutions"
+import { PokemonCPRange } from "./PokemonCPRange"
 
 interface PokemonCardProps {
   pokemon: Record<string, any>
@@ -29,12 +30,13 @@ export const PokemonCard: React.FC<PokemonCardProps> = ({
   isLoading,
 }) => {
   return (
-    <Tabs variant="pills" defaultValue="details">
-      <Tabs.List justify="center">
+    <Tabs variant="pills" defaultValue="details" className="pb-5">
+      <Tabs.List grow justify="center" className="pb-2">
         <Tabs.Tab value="details">Details</Tabs.Tab>
         <Tabs.Tab value="shiny">Shiny Rates</Tabs.Tab>
         <Tabs.Tab value="moves">Moves</Tabs.Tab>
         <Tabs.Tab value="evolutions">Evolutions</Tabs.Tab>
+        <Tabs.Tab value="cp">CP Range</Tabs.Tab>
       </Tabs.List>
 
       <Tabs.Panel value="details">
@@ -126,6 +128,23 @@ export const PokemonCard: React.FC<PokemonCardProps> = ({
             <PokemonImages pokemon={pokemon} />
             <Divider my="sm" variant="dashed" />
             <PokemonEvolutions pokemon={pokemon} />
+          </Card>
+        </Skeleton>
+      </Tabs.Panel>
+      <Tabs.Panel value="cp">
+        <Skeleton visible={isLoading}>
+          <Card shadow="sm" padding="lg" radius="md" withBorder>
+            <Title className="text-center" order={1}>
+              {capitalize(pokemon?.pokemon_name)}
+            </Title>
+            <Text
+              size="xs"
+              c="dimmed"
+              className="text-center"
+            >{`"${pokemon?.pokemon_flavor_text}"`}</Text>
+            <PokemonImages pokemon={pokemon} />
+            <Divider my="sm" variant="dashed" />
+            <PokemonCPRange pokemon={pokemon} />
           </Card>
         </Skeleton>
       </Tabs.Panel>

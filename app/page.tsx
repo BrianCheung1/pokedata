@@ -1,14 +1,21 @@
 import { ColorSchemeToggle } from "@/components/ColorSchemeToggle"
-import { Container } from "@mantine/core"
+import { Container, Flex, Title } from "@mantine/core"
 import { SearchBar } from "@/components/SearchBar"
-import { PokemonList } from "@/components/PokemonList"
+import { NavBar } from "@/components/NavBar"
 
 export default function Home() {
   return (
-    <Container fluid className="overflow-hidden">
-      <ColorSchemeToggle />
-      <SearchBar />
-      <PokemonList />
+    <Container fluid className="h-screen overflow-hidden">
+      <NavBar />
+      <Flex
+        className="h-full"
+        justify="center"
+        align="center"
+        direction="column"
+      >
+        <Title order={1}>PokeData</Title>
+        <SearchBar />
+      </Flex>
     </Container>
   )
 }

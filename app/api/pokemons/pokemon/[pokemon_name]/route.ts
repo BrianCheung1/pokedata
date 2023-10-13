@@ -28,6 +28,7 @@ export async function GET(
       buddy_distance,
       moves,
       evolution_family,
+      cp_range,
     ] = await Promise.all([
       findDualTypeDoubleDmgFrom(pokemon_name),
       findDualTypeDoubleDmgTo(pokemon_name),
@@ -40,6 +41,7 @@ export async function GET(
       findPokemonBuddy(pokemon_name),
       findAllMoves(pokemon_name),
       findEvolutionFamily(pokemon_name),
+      findCPRange(pokemon_name),
     ])
 
     return NextResponse.json(
@@ -57,8 +59,9 @@ export async function GET(
         buddy_distance: buddy_distance,
         moves: moves,
         evolution_family: evolution_family,
-        sprite: `https://img.pokemondb.net/sprites/go/normal/${pokemon_name}.png`,
-        sprite_shiny: `https://img.pokemondb.net/sprites/go/shiny/${pokemon_name}.png`,
+        cp_range: cp_range,
+        sprite: `https://img.pokemondb.net/sprites/go/normal/${pokemon_details.name}.png`,
+        sprite_shiny: `https://img.pokemondb.net/sprites/go/shiny/${pokemon_details.name}.png`,
       },
       { status: 200 }
     )
@@ -69,11 +72,21 @@ export async function GET(
 }
 
 async function getPokemonDetails(pokemonName: string) {
+  if (pokemonName === "nidoran♀") {
+    pokemonName = "nidoran-f"
+  } else if (pokemonName === "nidoran♂") {
+    pokemonName = "nidoran-m"
+  }
   const response = await axios.get(`${POKEAPI}/pokemon/${pokemonName}`)
   return response.data
 }
 
 async function getFlavorTextEntries(pokemonName: string) {
+  if (pokemonName === "nidoran♀") {
+    pokemonName = "nidoran-f"
+  } else if (pokemonName === "nidoran♂") {
+    pokemonName = "nidoran-m"
+  }
   const response = await axios.get(`${POKEAPI}/pokemon-species/${pokemonName}`)
   return response.data
 }
@@ -124,6 +137,11 @@ async function getChargedMove(moveName: string) {
 }
 
 async function getEvolutions(pokemonName: string) {
+  if (pokemonName === "nidoran♀") {
+    pokemonName = "nidoran-f"
+  } else if (pokemonName === "nidoran♂") {
+    pokemonName = "nidoran-m"
+  }
   const response = await axios.get(`${POKEAPI}/pokemon-species/${pokemonName}`)
   const response2 = await axios.get(response.data.evolution_chain.url)
   function getAllEvolutions(evolutionChain: { chain: any }) {
@@ -159,7 +177,6 @@ async function getCurrentMoves(pokemonName: string) {
       pokemon.pokemon_name.toLowerCase() === pokemonName &&
       pokemon.form === "Normal"
   )
-  console.log(pokemonMoves)
   if (pokemonMoves.cached) return pokemonMoves
   // Helper function to handle move details retrieval
   const fetchMoveDetails = async (moveName: string, isCharged: boolean) => {
@@ -277,6 +294,10 @@ async function getPokemonStats(pokemon_name: string) {
   return stats
 }
 
+async function getCPMultiplier() {
+  const response = await axios.get(`${POGOAPI}/cp_multiplier.json`)
+  return response.data
+}
 async function findPokemonBuddy(pokemon_name: string) {
   try {
     const response = await axios.get(`${POGOAPI}/pokemon_buddy_distances.json`)
@@ -470,6 +491,51 @@ async function findEvolutionFamily(pokemonName: string) {
   try {
     const pokemonEvolution = await getEvolutions(pokemonName)
     return pokemonEvolution
+  } catch (error) {
+    return NextResponse.json(
+      { msg: "findEvolutionFamily error", error },
+      { status: 500 }
+    )
+  }
+}
+
+async function findCPRange(pokemonName: string) {
+  try {
+    const pokemonStats = await getPokemonStats(pokemonName)
+    let CPMultiplier = await getCPMultiplier()
+    CPMultiplier.push({ level: 45.5, multiplier: 0.81779999 })
+    CPMultiplier.push({ level: 46, multiplier: 0.82029999 })
+    CPMultiplier.push({ level: 46.5, multiplier: 0.82279999 })
+    CPMultiplier.push({ level: 47, multiplier: 0.82529999 })
+    CPMultiplier.push({ level: 47.5, multiplier: 0.82779999 })
+    CPMultiplier.push({ level: 48, multiplier: 0.83029999 })
+    CPMultiplier.push({ level: 48.5, multiplier: 0.83279999 })
+    CPMultiplier.push({ level: 49, multiplier: 0.83529999 })
+    CPMultiplier.push({ level: 49.5, multiplier: 0.83779999 })
+    CPMultiplier.push({ level: 50, multiplier: 0.84029999 })
+    CPMultiplier.push({ level: 50.5, multiplier: 0.84279999 })
+    let data: any = []
+    CPMultiplier.map((cp: { level: number; multiplier: number }) => {
+      if (Number.isInteger(cp.level)) {
+        data.push({
+          level: cp.level,
+          range: `${Math.floor(
+            (pokemonStats.base_attack *
+              Math.pow(pokemonStats.base_defense, 0.5) *
+              Math.pow(pokemonStats.base_stamina, 0.5) *
+              Math.pow(cp.multiplier, 2)) /
+              10
+          )}-${Math.floor(
+            ((pokemonStats.base_attack + 15) *
+              Math.pow(pokemonStats.base_defense + 15, 0.5) *
+              Math.pow(pokemonStats.base_stamina + 15, 0.5) *
+              Math.pow(cp.multiplier, 2)) /
+              10
+          )}`,
+        })
+      }
+    })
+    return data
   } catch (error) {
     return NextResponse.json(
       { msg: "findEvolutionFamily error", error },

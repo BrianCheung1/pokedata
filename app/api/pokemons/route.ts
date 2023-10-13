@@ -10,9 +10,6 @@ export async function GET(req: Request) {
     pokemons = pokemons.data.filter((pokemon: { form: string })=> {
       return pokemon.form === "Normal"
     })
-
-    console.log(pokemons)
-
     return NextResponse.json(
       {
         msg: "Success",
