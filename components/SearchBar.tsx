@@ -7,7 +7,7 @@ import { CopyURL } from "./CopyURL"
 
 export const SearchBar = () => {
   const [value, setValue] = useState("")
-  const currentPage = usePathname().split("/").pop() || ""
+  const currentPage = decodeURIComponent(usePathname()).split("/").pop()?.split("%20")[0] || ""
   const { data: allPokemons = [], isLoading: isPokemonsLoading } =
     useAllPokemons()
   const router = useRouter()
@@ -29,12 +29,19 @@ export const SearchBar = () => {
         data={
           !isPokemonsLoading &&
           allPokemons?.pokemons?.map(
-            (pokemon: { pokemon_name: string }) => pokemon.pokemon_name
+            (pokemon: { pokemon_name: string; form: string }) =>
+              `${pokemon.pokemon_name} ${
+                pokemon.form === "Normal" ? "" : pokemon.form
+              }`
           )
         }
         onChange={(newValue) => setValue(newValue)}
         maxDropdownHeight={200}
-        onOptionSubmit={(newValue) => router.push(`/pokemons/${newValue}`)}
+        onOptionSubmit={(newValue) => {
+          router.push(`/pokemons/${newValue}`)
+  
+          setValue(newValue)
+        }}
         leftSection={<CopyURL />}
         rightSection={
           value && (

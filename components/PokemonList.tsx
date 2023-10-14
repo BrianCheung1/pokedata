@@ -18,41 +18,54 @@ export const PokemonList = () => {
     useAllPokemons()
   const router = useRouter()
 
-  const renderPokemons = allPokemons?.pokemons?.map((pokemon: any) => (
-    <Card
-      bg={darken(colors[pokemon.type[0].toLowerCase()], 0.7)}
-      className="cursor-pointer mb-2"
-      radius="md"
-      withBorder
-      component="a"
-      href={`/pokemons/${pokemon.pokemon_name}`}
-      key={pokemon.pokemon_name}
-    >
-      <Flex gap="sm" align="center">
-        <Image
-          src={`https://img.pokemondb.net/sprites/go/normal/${pokemon.pokemon_name.toLowerCase()}.png`}
-          h={50}
-          w={50}
-          fit="contain"
-          alt="Pokemon"
-          fallbackSrc="/images/default-pokemon.jpg"
-        />
-        <Flex direction="column">
-          <Text fw={500}>{pokemon.pokemon_name}</Text>
-          <Text size="xs" c="dimmed">
-            #{pokemon.pokemon_id}
-          </Text>
+  const renderPokemons = allPokemons?.pokemons?.map((pokemon: any) => {
+    const pokemonNameMap: Record<string, string> = {
+      "nidoran♀": "nidoran-f",
+      "nidoran♂": "nidoran-m",
+      "Farfetch’d": "farfetchd",
+    }
+
+    const transformedName =
+      pokemonNameMap[pokemon.pokemon_name] || pokemon.pokemon_name.toLowerCase()
+
+    return (
+      <Card
+        bg={darken(colors[pokemon.type[0].toLowerCase()], 0.7)}
+        className="cursor-pointer mb-2"
+        radius="md"
+        withBorder
+        component="a"
+        href={`/pokemons/${pokemon.pokemon_name}`}
+        key={pokemon.pokemon_name}
+      >
+        <Flex gap="sm" align="center">
+          <Image
+            src={`https://img.pokemondb.net/sprites/go/normal/${transformedName}.png`}
+            h={50}
+            w={50}
+            fit="contain"
+            alt="Pokemon"
+            fallbackSrc="/images/default-pokemon.jpg"
+          />
+          <Flex direction="column">
+            <Text fw={500}>{`${pokemon.pokemon_name} ${
+              pokemon.form === "Normal" ? "" : pokemon.form
+            }`}</Text>
+            <Text size="xs" c="dimmed">
+              #{pokemon.pokemon_id}
+            </Text>
+          </Flex>
+          <Group className="ml-auto" gap="xs">
+            {pokemon?.type?.map((type: string) => (
+              <Badge key={type} color={colors[type.toLowerCase()]}>
+                {type}
+              </Badge>
+            ))}
+          </Group>
         </Flex>
-        <Group className="ml-auto" gap="xs">
-          {pokemon?.type?.map((type: string) => (
-            <Badge key={type} color={colors[type.toLowerCase()]}>
-              {type}
-            </Badge>
-          ))}
-        </Group>
-      </Flex>
-    </Card>
-  ))
+      </Card>
+    )
+  })
 
   return (
     <ScrollArea h={850} type="auto" offsetScrollbars>

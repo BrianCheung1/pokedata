@@ -2,6 +2,7 @@ import { NextResponse } from "next/server"
 import Axios from "axios"
 import { capitalize } from "@/libs/utils"
 import { setupCache } from "axios-cache-interceptor"
+import { PokemonMoves } from "@/components/PokemonMoves"
 const DEFAULT_CACHE_TIME = 5 * 60 * 1000
 const POGOAPI = "https://pogoapi.net/api/v1"
 const POKEAPI = "https://pokeapi.co/api/v2"
@@ -12,8 +13,9 @@ const axios = setupCache( Axios)
 export async function GET(
   req: Request,
   { params }: { params: { pokemon_name: string } }
-) {
-  const pokemon_name = params.pokemon_name.toLowerCase()
+) {const regex = /[^a-zA-Z♀♂]/g;
+  const pokemon_name = params.pokemon_name.split(" ")[0].replace(regex, '').toLowerCase()
+
   try {
     const pokemon_details = await getPokemonDetails(pokemon_name)
     const [
@@ -34,14 +36,14 @@ export async function GET(
       findDualTypeDoubleDmgTo(pokemon_name),
       getPokemonTypes(pokemon_details),
       findDualTypeHalfDmgFrom(pokemon_name),
-      getPokemonStats(pokemon_name),
+      getPokemonStats(pokemon_details.id),
       findFlavorText(pokemon_name),
       getShiny(pokemon_name),
       findPokemonBoosted(pokemon_name),
       findPokemonBuddy(pokemon_name),
       findAllMoves(pokemon_name),
       findEvolutionFamily(pokemon_name),
-      findCPRange(pokemon_name),
+      findCPRange(pokemon_details.id),
     ])
 
     return NextResponse.json(
@@ -174,9 +176,8 @@ async function getCurrentMoves(pokemonName: string) {
   const pokemonDetails = await getPokemonDetails(pokemonName)
   const pokemonTypes = await getPokemonTypes(pokemonDetails)
   const pokemonMoves = response.data.find(
-    (pokemon: { pokemon_name: string; form: string }) =>
-      pokemon.pokemon_name.toLowerCase() === pokemonName &&
-      pokemon.form === "Normal"
+    (pokemon: { pokemon_id: number}) =>
+      pokemon.pokemon_id === pokemonDetails.id
   )
   if (pokemonMoves.cached) return pokemonMoves
   // Helper function to handle move details retrieval
@@ -279,18 +280,16 @@ async function getShiny(pokemon_name: string) {
   return response.data[Number(pokemon_details.id)]
 }
 
-async function getPokemonStats(pokemon_name: string) {
+async function getPokemonStats(id: number) {
   const response = await axios.get(`${POGOAPI}/pokemon_stats.json`)
   const response2 = await axios.get(`${POGOAPI}/pokemon_max_cp.json`)
   let stats = response.data.find(
-    (pokemon: { pokemon_name: string; form: string }) =>
-      pokemon.pokemon_name.toLowerCase() === pokemon_name &&
-      pokemon.form === "Normal"
+    (pokemon: { pokemon_id: number; form: string }) =>
+      pokemon.pokemon_id === id
   )
   stats.max_cp = response2.data.find(
-    (pokemon: { pokemon_name: string; form: string }) =>
-      pokemon.pokemon_name.toLowerCase() === pokemon_name &&
-      pokemon.form === "Normal"
+    (pokemon: { pokemon_id: number; form: string }) =>
+    pokemon.pokemon_id === id
   ).max_cp
   return stats
 }
@@ -500,9 +499,9 @@ async function findEvolutionFamily(pokemonName: string) {
   }
 }
 
-async function findCPRange(pokemonName: string) {
+async function findCPRange(id: number) {
   try {
-    const pokemonStats = await getPokemonStats(pokemonName)
+    const pokemonStats = await getPokemonStats(id)
     let CPMultiplier = await getCPMultiplier()
     CPMultiplier.push({ level: 45.5, multiplier: 0.81779999 })
     CPMultiplier.push({ level: 46, multiplier: 0.82029999 })
