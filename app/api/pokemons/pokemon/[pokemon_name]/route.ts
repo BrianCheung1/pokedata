@@ -2,8 +2,6 @@ import { NextResponse } from "next/server"
 import Axios from "axios"
 import { capitalize } from "@/libs/utils"
 import { setupCache } from "axios-cache-interceptor"
-import { PokemonMoves } from "@/components/PokemonMoves"
-const DEFAULT_CACHE_TIME = 5 * 60 * 1000
 const POGOAPI = "https://pogoapi.net/api/v1"
 const POKEAPI = "https://pokeapi.co/api/v2"
 
@@ -40,7 +38,7 @@ export async function GET(
       findFlavorText(pokemon_name),
       getShiny(pokemon_name),
       findPokemonBoosted(pokemon_name),
-      findPokemonBuddy(pokemon_name),
+      findPokemonBuddy(pokemon_details.id),
       findAllMoves(pokemon_name),
       findEvolutionFamily(pokemon_name),
       findCPRange(pokemon_details.id),
@@ -298,15 +296,14 @@ async function getCPMultiplier() {
   const response = await axios.get(`${POGOAPI}/cp_multiplier.json`)
   return response.data
 }
-async function findPokemonBuddy(pokemon_name: string) {
+async function findPokemonBuddy(id: number) {
   try {
     const response = await axios.get(`${POGOAPI}/pokemon_buddy_distances.json`)
     return Object.values(response.data)
       .flat()
       .find(
         (pokemon: any) =>
-          pokemon.pokemon_name.toLowerCase() === pokemon_name.toLowerCase() &&
-          pokemon.form === "Normal"
+          pokemon.pokemon_id === id
       )
   } catch (error) {
     return NextResponse.json(

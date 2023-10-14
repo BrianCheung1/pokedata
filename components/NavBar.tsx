@@ -4,7 +4,6 @@ import { IconNotebook, IconSearch, IconPokeball } from "@tabler/icons-react"
 import { useDisclosure } from "@mantine/hooks"
 import { ColorSchemeToggle } from "./ColorSchemeToggle"
 import { usePathname, useRouter } from "next/navigation"
-import Link from "next/link"
 
 const data = [
   {
@@ -28,22 +27,22 @@ const data = [
 export const NavBar = () => {
   const [opened, { open, close }] = useDisclosure(false)
   const pathName = usePathname()
-  const items = data.map((item, index) => (
-    <Link href={item.url} key={item.label}>
-      <NavLink
-        active={item.url === pathName}
-        label={item.label}
-        leftSection={item.leftSection}
-        variant="subtle"
-      />
-    </Link>
+  const router = useRouter()
+  const items = data.map((item) => (
+    <NavLink
+      key={item.label}
+      active={item.url === pathName}
+      label={item.label}
+      leftSection={item.leftSection}
+      variant="subtle"
+      onClick={() => router.push(item.url)}
+    />
   ))
 
   return (
     <>
       <Drawer opened={opened} onClose={close} title="Menu">
         <Box w={220}>{items}</Box>
-
         <ColorSchemeToggle />
       </Drawer>
       <Container h={50}>
