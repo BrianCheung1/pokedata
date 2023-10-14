@@ -19,6 +19,11 @@ const data = [
     leftSection: <IconNotebook size="1rem" stroke={1.5} />,
     url: "/pokedex",
   },
+  {
+    label: "Team Rocket Lineups",
+    leftSection: <IconNotebook size="1rem" stroke={1.5} />,
+    url: "/teamrocket",
+  },
 ]
 
 export const NavBar = () => {

@@ -5,7 +5,7 @@ import { NavBar } from "@/components/NavBar"
 
 export default function Home() {
   return (
-    <Container fluid className="bg-black">
+    <Container fluid>
       <NavBar />
       <Flex
         className="h-[calc(100vh-50px)] "

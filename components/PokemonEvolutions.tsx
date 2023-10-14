@@ -21,6 +21,7 @@ export const PokemonEvolutions: React.FC<PokemonEvolutionsProps> = ({
           h={200}
           fit="contain"
           alt="Pokemon"
+          fallbackSrc="/images/default-pokemon.jpg"
         />
         <Text size="xs" c="dimmed" className="text-center">{capitalize(element.name)}</Text>
       </Stack>

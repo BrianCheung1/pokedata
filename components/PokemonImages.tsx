@@ -10,13 +10,13 @@ export const PokemonImages: React.FC<PokemonImagesProps> = ({
   return (
     <Grid justify="space-around">
       <Grid.Col span="content" className="text-center">
-        <Image src={sprite} h={200} fit="contain" alt="Pokemon" />
+        <Image src={sprite} h={200} fit="contain" alt="Pokemon" fallbackSrc="/images/default-pokemon.jpg"/>
         <Badge>Base</Badge>
       </Grid.Col>
 
       {shiny && (
         <Grid.Col span="content" className="text-center">
-          <Image src={sprite_shiny} h={200} fit="contain" alt="Pokemon" />
+          <Image src={sprite_shiny} h={200} fit="contain" alt="Pokemon" fallbackSrc="/images/default-pokemon.jpg"/>
           <Badge color="#F7D02C">Shiny</Badge>
         </Grid.Col>
       )}

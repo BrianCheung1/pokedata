@@ -8,6 +8,7 @@ import {
   Stack,
   Tabs,
   Divider,
+  darken,
 } from "@mantine/core"
 import { PokemonTypeVulnerable } from "./PokemonTypeVulnerable"
 import { PokemonTypeResistance } from "./PokemonTypeResistance"
@@ -19,6 +20,7 @@ import { PokemonWeatherBoosted } from "./PokemonWeatherBoosted"
 import { PokemonMoves } from "./PokemonMoves"
 import { PokemonEvolutions } from "./PokemonEvolutions"
 import { PokemonCPRange } from "./PokemonCPRange"
+import { colors } from "@/libs/utils"
 
 interface PokemonCardProps {
   pokemon: Record<string, any>
@@ -30,7 +32,7 @@ export const PokemonCard: React.FC<PokemonCardProps> = ({
   isLoading,
 }) => {
   return (
-    <Tabs variant="pills" defaultValue="details" className="pb-5">
+    <Tabs variant="pills" defaultValue="details" className="pb-5 " >
       <Tabs.List grow justify="center" className="pb-2">
         <Tabs.Tab value="details">Details</Tabs.Tab>
         <Tabs.Tab value="shiny">Shiny Rates</Tabs.Tab>
@@ -41,10 +43,15 @@ export const PokemonCard: React.FC<PokemonCardProps> = ({
 
       <Tabs.Panel value="details">
         <Skeleton visible={isLoading}>
-          <Card shadow="sm" padding="lg" radius="md" withBorder>
+          <Card shadow="sm" padding="lg" radius="md" withBorder bg={darken(colors[pokemon?.pokemon_types?.[0]] ? colors[pokemon?.pokemon_types?.[0]] : "blue", 0.7) }>
             <Title className="text-center" order={1}>
               {capitalize(pokemon?.pokemon_name)}
             </Title>
+            <Text
+              size="xs"
+              c="dimmed"
+              className="text-center"
+            >{`#${pokemon?.pokemon_id}`}</Text>
             <Text
               size="xs"
               c="dimmed"
@@ -82,7 +89,7 @@ export const PokemonCard: React.FC<PokemonCardProps> = ({
       </Tabs.Panel>
       <Tabs.Panel value="shiny">
         <Skeleton visible={isLoading}>
-          <Card shadow="sm" padding="lg" radius="md" withBorder>
+          <Card shadow="sm" padding="lg" radius="md" withBorder bg={darken(colors[pokemon?.pokemon_types?.[0]] ? colors[pokemon?.pokemon_types?.[0]] : "blue", 0.7) }>
             <Title className="text-center" order={1}>
               {capitalize(pokemon?.pokemon_name)}
             </Title>
@@ -99,7 +106,7 @@ export const PokemonCard: React.FC<PokemonCardProps> = ({
       </Tabs.Panel>
       <Tabs.Panel value="moves">
         <Skeleton visible={isLoading}>
-          <Card shadow="sm" padding="lg" radius="md" withBorder>
+          <Card shadow="sm" padding="lg" radius="md" withBorder bg={darken(colors[pokemon?.pokemon_types?.[0]] ? colors[pokemon?.pokemon_types?.[0]] : "blue", 0.7) }>
             <Title className="text-center" order={1}>
               {capitalize(pokemon?.pokemon_name)}
             </Title>
@@ -116,7 +123,7 @@ export const PokemonCard: React.FC<PokemonCardProps> = ({
       </Tabs.Panel>
       <Tabs.Panel value="evolutions">
         <Skeleton visible={isLoading}>
-          <Card shadow="sm" padding="lg" radius="md" withBorder>
+          <Card shadow="sm" padding="lg" radius="md" withBorder bg={darken(colors[pokemon?.pokemon_types?.[0]] ? colors[pokemon?.pokemon_types?.[0]] : "blue", 0.7) }>
             <Title className="text-center" order={1}>
               {capitalize(pokemon?.pokemon_name)}
             </Title>
@@ -133,7 +140,7 @@ export const PokemonCard: React.FC<PokemonCardProps> = ({
       </Tabs.Panel>
       <Tabs.Panel value="cp">
         <Skeleton visible={isLoading}>
-          <Card shadow="sm" padding="lg" radius="md" withBorder>
+          <Card shadow="sm" padding="lg" radius="md" bg={darken(colors[pokemon?.pokemon_types?.[0]] ? colors[pokemon?.pokemon_types?.[0]] : "blue", 0.7) }>
             <Title className="text-center" order={1}>
               {capitalize(pokemon?.pokemon_name)}
             </Title>

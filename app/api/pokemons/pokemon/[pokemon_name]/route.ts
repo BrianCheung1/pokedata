@@ -48,6 +48,7 @@ export async function GET(
       {
         msg: "Success",
         pokemon_name: pokemon_name,
+        pokemon_id: pokemon_details.id,
         pokemon_types: pokemon_types,
         type_effectiveness: type_effectiveness,
         type_vulnerable: type_vulnerable,

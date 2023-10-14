@@ -7,11 +7,11 @@ import {
   Flex,
   Badge,
   Group,
-  darken
+  darken,
+  Image,
 } from "@mantine/core"
 import { useRouter } from "next/navigation"
 import { colors } from "@/libs/utils"
-
 
 export const PokemonList = () => {
   const { data: allPokemons = [], isLoading: isPokemonsLoading } =
@@ -19,18 +19,23 @@ export const PokemonList = () => {
   const router = useRouter()
 
   const renderPokemons = allPokemons?.pokemons?.map((pokemon: any) => (
-    <Card bg={darken(colors[pokemon.type[0].toLowerCase()], 0.7)}
-      onClick={() =>
-        router.push(
-          `/pokemons/${pokemon.pokemon_name}`
-        )
-      }
+    <Card
+      bg={darken(colors[pokemon.type[0].toLowerCase()], 0.7)}
+      onClick={() => router.push(`/pokemons/${pokemon.pokemon_name}`)}
       className="cursor-pointer mb-2"
       radius="md"
       withBorder
       key={pokemon.pokemon_name}
     >
-      <Flex gap="sm" align="center" className="">
+      <Flex gap="sm" align="center">
+        <Image
+          src={`https://img.pokemondb.net/sprites/go/normal/${pokemon.pokemon_name.toLowerCase()}.png`}
+          h={50}
+          w={50}
+          fit="contain"
+          alt="Pokemon"
+          fallbackSrc="/images/default-pokemon.jpg"
+        />
         <Flex direction="column">
           <Text fw={500}>{pokemon.pokemon_name}</Text>
           <Text size="xs" c="dimmed">
