@@ -1,11 +1,10 @@
 "use client"
 import { NavLink, Box } from "@mantine/core"
-import { IconNotebook, IconSearch } from "@tabler/icons-react"
+import { IconNotebook, IconSearch, IconPokeball } from "@tabler/icons-react"
 import { useDisclosure } from "@mantine/hooks"
 import { Drawer, Burger, Container } from "@mantine/core"
 import { ColorSchemeToggle } from "./ColorSchemeToggle"
 import { usePathname, useRouter } from "next/navigation"
-import { useState } from "react"
 
 const data = [
   {
@@ -16,7 +15,7 @@ const data = [
   },
   {
     label: "Pokedex",
-    leftSection: <IconNotebook size="1rem" stroke={1.5} />,
+    leftSection: <IconPokeball size="1rem" stroke={1.5} />,
     url: "/pokedex",
   },
   {

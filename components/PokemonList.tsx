@@ -54,7 +54,7 @@ export const PokemonList = () => {
   ))
 
   return (
-    <ScrollArea h={850} type="auto">
+    <ScrollArea h={850} type="auto" offsetScrollbars>
       {renderPokemons}
     </ScrollArea>
   )
