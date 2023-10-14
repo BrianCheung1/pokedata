@@ -1,5 +1,4 @@
-import { Text, Grid, Image, Badge, Title, Table, Tooltip } from "@mantine/core"
-import { capitalize } from "@/libs/utils"
+import { Table } from "@mantine/core"
 
 interface PokemonMoves {
   pokemon: Record<string, any>

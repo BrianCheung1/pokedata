@@ -21,10 +21,11 @@ export const PokemonList = () => {
   const renderPokemons = allPokemons?.pokemons?.map((pokemon: any) => (
     <Card
       bg={darken(colors[pokemon.type[0].toLowerCase()], 0.7)}
-      onClick={() => router.push(`/pokemons/${pokemon.pokemon_name}`)}
       className="cursor-pointer mb-2"
       radius="md"
       withBorder
+      component="a"
+      href={`/pokemons/${pokemon.pokemon_name}`}
       key={pokemon.pokemon_name}
     >
       <Flex gap="sm" align="center">

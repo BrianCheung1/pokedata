@@ -1,27 +1,37 @@
-import { Text, Title } from "@mantine/core"
+import React from "react";
+import { Text, Title } from "@mantine/core";
 
 interface PokemonStatsProps {
-  pokemon: Record<string, any>
+  pokemon: {
+    pokemon_stats?: {
+      max_cp?: number;
+      base_attack?: number;
+      base_defense?: number;
+      base_stamina?: number;
+    };
+  };
 }
 
 export const PokemonStats: React.FC<PokemonStatsProps> = ({
-  pokemon : {pokemon_stats},
+  pokemon: { pokemon_stats = {} },
 }) => {
+  const { max_cp, base_attack, base_defense, base_stamina } = pokemon_stats;
+
   return (
     <>
       <Title order={5}>Pokemon Stats</Title>
       <Text size="md" c="dimmed">
-        Max CP: {pokemon_stats?.max_cp}
+        Max CP: {max_cp}
       </Text>
       <Text size="md" c="dimmed">
-        Base Attack: {pokemon_stats?.base_attack}
+        Base Attack: {base_attack}
       </Text>
       <Text size="md" c="dimmed">
-        Base Defense: {pokemon_stats?.base_defense}
+        Base Defense: {base_defense}
       </Text>
       <Text size="md" c="dimmed">
-        Base Stamina: {pokemon_stats?.base_stamina}
+        Base Stamina: {base_stamina}
       </Text>
     </>
-  )
-}
+  );
+};

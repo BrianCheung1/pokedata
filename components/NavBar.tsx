@@ -1,10 +1,10 @@
 "use client"
-import { NavLink, Box } from "@mantine/core"
+import { NavLink, Box, Drawer, Burger, Container } from "@mantine/core"
 import { IconNotebook, IconSearch, IconPokeball } from "@tabler/icons-react"
 import { useDisclosure } from "@mantine/hooks"
-import { Drawer, Burger, Container } from "@mantine/core"
 import { ColorSchemeToggle } from "./ColorSchemeToggle"
 import { usePathname, useRouter } from "next/navigation"
+import Link from "next/link"
 
 const data = [
   {
@@ -28,18 +28,15 @@ const data = [
 export const NavBar = () => {
   const [opened, { open, close }] = useDisclosure(false)
   const pathName = usePathname()
-  const router = useRouter()
   const items = data.map((item, index) => (
-    <NavLink
-      key={item.label}
-      active={item.url === pathName}
-      label={item.label}
-      leftSection={item.leftSection}
-      onClick={() => {
-        router.push(item.url)
-      }}
-      variant="subtle"
-    />
+    <Link href={item.url} key={item.label}>
+      <NavLink
+        active={item.url === pathName}
+        label={item.label}
+        leftSection={item.leftSection}
+        variant="subtle"
+      />
+    </Link>
   ))
 
   return (

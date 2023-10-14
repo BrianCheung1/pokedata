@@ -1,33 +1,35 @@
-import { Badge, Text, Title } from "@mantine/core"
+import React from "react";
+import { Badge, Title } from "@mantine/core";
+import { colors } from "@/libs/utils";
 
-import { colors } from "@/libs/utils"
 interface PokemonTypeVulnerableProps {
-  pokemon: Record<string, any>
+  pokemon: {
+    type_vulnerable?: string[];
+  };
 }
 
 export const PokemonTypeVulnerable: React.FC<PokemonTypeVulnerableProps> = ({
-  pokemon : {type_vulnerable},
+  pokemon: { type_vulnerable = [] },
 }) => {
   const renderTypeVulnerable = () => {
-    const list: any = []
-    type_vulnerable?.sort().forEach((element: string) => {
-      list.push(
-        <Badge
-          key={element}
-          className="mr-2"
-          color={colors[element.toLowerCase()]}
-        >
+    return type_vulnerable
+      .sort()
+      .map((element: string) => (
+        <Badge key={element} className="mr-2" color={colors[element.toLowerCase()]}>
           {element}
         </Badge>
-      )
-    })
-    return list
-  }
+      ));
+  };
 
   return (
     <>
-      <Title order={5}>Vulnerable To</Title>
-      {renderTypeVulnerable()}
+      {type_vulnerable.length > 0 && (
+        <>
+          <Title order={5}>Vulnerable To</Title>
+          {renderTypeVulnerable()}
+        </>
+      )}
     </>
-  )
-}
+  );
+};
+
