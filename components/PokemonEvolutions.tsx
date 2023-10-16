@@ -28,6 +28,17 @@ export const PokemonEvolutions: React.FC<PokemonEvolutionsProps> = ({
         <Text size="xs" c="dimmed" className="text-center">
           {capitalize(element.name)}
         </Text>
+        <Image
+          src={element.sprite_shiny}
+          fit="contain"
+          alt="Pokemon"
+          h={200}
+          className="cursor-pointer"
+          onClick={() => router.push(element.name)}
+        />
+        <Text size="xs" c="dimmed" className="text-center">
+          {capitalize(element.name)} Shiny
+        </Text>
       </Stack>
     ))
   }

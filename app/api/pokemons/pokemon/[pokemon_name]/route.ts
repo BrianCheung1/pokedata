@@ -146,17 +146,18 @@ async function getEvolutions(pokemonName: string) {
 
   async function traverseChain(
     chain: { species: any; evolves_to: any },
-    evolutions_family: { name: string; sprite: string }[]
+    evolutions_family: { name: string; sprite: string, sprite_shiny:string }[]
   ) {
     const currentSpecies = chain.species
     const pokemon_details = await getPokemonDetails(currentSpecies.name)
-    console.log(currentSpecies.name)
-
     evolutions_family.push({
       name: currentSpecies.name,
       sprite:
         pokemon_details.sprites.other.home.front_default ||
         pokemon_details.sprites.other["official-artwork"].front_default,
+      sprite_shiny:
+        pokemon_details.sprites.other.home.front_shiny ||
+        pokemon_details.sprites.other["official-artwork"].front_shiny,
     })
 
     if (chain.evolves_to) {
@@ -168,8 +169,10 @@ async function getEvolutions(pokemonName: string) {
     }
   }
 
-  const evolutions_family: { name: string; sprite: string }[] = []
-  await traverseChain(evolutionChainResponse.data.chain, evolutions_family)
+  const evolutions_family: { name: string; sprite: string, sprite_shiny:string }[] = []
+  await Promise.all([
+    traverseChain(evolutionChainResponse.data.chain, evolutions_family),
+  ])
   return evolutions_family
 }
 
@@ -251,8 +254,12 @@ async function getCurrentMoves(pokemonName: string) {
 
   // Update pokemonMoves object
   pokemonMoves.fast_moves = fastMoves.sort((a, b) => b.dps_eps - a.dps_eps)
-  pokemonMoves.elite_fast_moves = eliteFastMoves.sort((a, b) => b.dps_eps - a.dps_eps)
-  pokemonMoves.charged_moves = chargedMoves.sort((a, b) => b.dps_dpe - a.dps_dpe)
+  pokemonMoves.elite_fast_moves = eliteFastMoves.sort(
+    (a, b) => b.dps_eps - a.dps_eps
+  )
+  pokemonMoves.charged_moves = chargedMoves.sort(
+    (a, b) => b.dps_dpe - a.dps_dpe
+  )
   pokemonMoves.elite_charged_moves = eliteChargedMoves.sort(
     (a, b) => b.dps_dpe - a.dps_dpe
   )
