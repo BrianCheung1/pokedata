@@ -14,7 +14,7 @@ export async function GET(
 ) {
   const regex = /[^a-zA-Z.♀♂]/g
   let pokemon_name = params.pokemon_name
-    // .split(" ")[0]
+    .split(" ")[0]
     .replace(regex, "")
     .toLowerCase()
 

@@ -41,7 +41,13 @@ export const NavBar = () => {
 
   return (
     <>
-      <Drawer opened={opened} onClose={close} title="Menu">
+      <Drawer
+        opened={opened}
+        onClose={close}
+        title="Menu"
+        size="xs"
+        overlayProps={{ backgroundOpacity: 0.5, blur: 4 }}
+      >
         <Box w={220}>{items}</Box>
         <ColorSchemeToggle />
       </Drawer>

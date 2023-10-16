@@ -18,7 +18,7 @@ export const PokemonImages: React.FC<PokemonImagesProps> = ({
     <Grid justify="space-around">
       {renderImageCol(sprite, "Base")}
       
-      {shiny && renderImageCol(sprite_shiny, "Shiny", "#F7D02C")}
+      {renderImageCol(sprite_shiny, "Shiny", "#F7D02C")}
     </Grid>
   );
 };

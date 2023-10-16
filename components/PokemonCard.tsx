@@ -38,7 +38,7 @@ export const PokemonCard: React.FC<PokemonCardProps> = ({
         <Tabs.Tab value="details">Details</Tabs.Tab>
         <Tabs.Tab value="shiny">Shiny Rates</Tabs.Tab>
         <Tabs.Tab value="moves">Moves</Tabs.Tab>
-        <Tabs.Tab value="evolutions">Evolutions</Tabs.Tab>
+        <Tabs.Tab value="evolutions">Family</Tabs.Tab>
         <Tabs.Tab value="cp">CP Range</Tabs.Tab>
       </Tabs.List>
       <Tabs.Panel value="details">

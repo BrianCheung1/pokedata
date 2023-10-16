@@ -13,6 +13,7 @@ import {
   Button,
   Transition,
   rem,
+  Skeleton,
 } from "@mantine/core"
 import { colors } from "@/libs/utils"
 import { capitalize } from "@/libs/utils"
@@ -25,15 +26,11 @@ export const TeamRocketGrunts = () => {
   const [scroll, scrollTo] = useWindowScroll()
   const router = useRouter()
 
-  if (!data || isLoading) return null
+  if (!data) return null
 
   const renderGrunts = data.grunts.map(
     (grunt: { name: string; team: any[]; type: string }) => (
-      <Grid.Col
-        key={grunt.name}
-        span={{ base: 12, md: 6, xl: 4 }}
-        
-      >
+      <Grid.Col key={grunt.name} span={{ base: 12, md: 6, xl: 4 }}>
         <Card
           bg={darken(
             grunt.type ? colors[grunt.type.toLowerCase()] : "blue",
@@ -103,7 +100,7 @@ export const TeamRocketGrunts = () => {
           )}
         </Transition>
       </Affix>
-      {renderGrunts}
+      <Skeleton visible={isLoading}>{renderGrunts}</Skeleton>
     </Grid>
   )
 }

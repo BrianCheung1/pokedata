@@ -14,7 +14,7 @@ interface PokemonCPRangeProps {
 export const PokemonCPRange: React.FC<PokemonCPRangeProps> = ({
   pokemon: { cp_range },
 }) => {
-  const renderCP = cp_range?.map(({ level, range }) => (
+  const renderCP = cp_range?.sort((a, b) => b.level - a.level).map(({ level, range }) => (
     <Table.Tr key={level}>
       <Table.Td>{level}</Table.Td>
       <Table.Td align="right">{range}</Table.Td>

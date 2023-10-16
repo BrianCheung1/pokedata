@@ -8,7 +8,9 @@ import {
   Group,
   darken,
   Image,
-  Autocomplete,
+  TextInput,
+  Pagination,
+  Skeleton
 } from "@mantine/core"
 import { colors } from "@/libs/utils"
 import { useState, useMemo } from "react"
@@ -17,24 +19,22 @@ export const PokemonList = () => {
   const { data: allPokemons = [], isLoading: isPokemonsLoading } =
     useAllPokemons()
   const [filter, setFilter] = useState("")
-
-  const autocompleteData = useMemo(() => {
-    return allPokemons?.pokemons
-      ?.filter((pokemon: { form: string }) => pokemon.form === "Normal")
-      .map((pokemon: { pokemon_name: string; form: string }) => ({
-        label: pokemon.pokemon_name,
-        value: pokemon.pokemon_name + pokemon.form,
-      }));
-  }, [allPokemons]);
+  const [currentPage, setCurrentPage] = useState(1)
 
   const filteredPokemons = useMemo(() => {
-    return allPokemons?.pokemons?.filter(
-      (pokemon: { pokemon_name: string }) =>
-        pokemon.pokemon_name.toLowerCase().includes(filter.toLowerCase())
-    );
-  }, [allPokemons, filter]);
+    return allPokemons?.pokemons?.filter((pokemon: { pokemon_name: string }) =>
+      pokemon.pokemon_name.toLowerCase().includes(filter.toLowerCase())
+    )
+  }, [allPokemons, filter])
 
-  const renderPokemons = filteredPokemons?.map(
+  const indexOfLastPokemon = currentPage * 10
+  const indexOfFirstPokemon = indexOfLastPokemon - 10
+  const currentPokemons = filteredPokemons?.slice(
+    indexOfFirstPokemon,
+    indexOfLastPokemon
+  )
+
+  const renderPokemons = currentPokemons?.map(
     (pokemon: {
       pokemon_name: string
       form: string
@@ -97,22 +97,29 @@ export const PokemonList = () => {
     }
   )
 
+  const totalPages = Math.ceil(filteredPokemons?.length / 10)
+
   return (
     <>
-      <Autocomplete
+      <TextInput
         value={filter}
         className="flex items-center justify-center mb-5"
         placeholder="Search Pokemon..."
-        data={autocompleteData}
-        onChange={(newValue) => setFilter(newValue)}
-        maxDropdownHeight={200}
-        onOptionSubmit={(newValue) => {
-          setFilter(newValue)
+        onChange={(event) => {
+          setFilter(event.currentTarget.value), setCurrentPage(1)
         }}
       />
-      <ScrollArea h={850} type="auto" offsetScrollbars>
-        {renderPokemons}
-      </ScrollArea>
+      <Skeleton visible={isPokemonsLoading}>
+        <ScrollArea h={700} type="auto" offsetScrollbars className="mb-5">
+          {renderPokemons}
+        </ScrollArea>
+      </Skeleton>
+      <Pagination
+        value={currentPage}
+        onChange={setCurrentPage}
+        total={totalPages}
+        className="flex justify-center"
+      />
     </>
   )
 }

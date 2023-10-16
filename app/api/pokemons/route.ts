@@ -15,7 +15,8 @@ export async function GET(req: Request) {
     const filteredPokemon = pokemons.data.filter(
       (pokemon: { pokemon_id: number; form: string }) => {
         const hasNormalForm = normalForms.find(
-          (normalPokemon: { pokemon_id: number }) => normalPokemon.pokemon_id === pokemon.pokemon_id
+          (normalPokemon: { pokemon_id: number }) =>
+            normalPokemon.pokemon_id === pokemon.pokemon_id
         )
 
         const released = released_pokemons.data.hasOwnProperty(
