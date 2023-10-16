@@ -9,7 +9,7 @@ export const PokemonImages: React.FC<PokemonImagesProps> = ({
 }) => {
   const renderImageCol = (src: string, label: string, badgeColor?: string) => (
     <Grid.Col span="content" className="text-center">
-      <Image src={src} h={200} fit="contain" alt="Pokemon" fallbackSrc="/images/default-pokemon.jpg" />
+      <Image src={src} h={200} fit="contain" alt="Pokemon" />
       <Badge color={badgeColor}>{label}</Badge>
     </Grid.Col>
   );

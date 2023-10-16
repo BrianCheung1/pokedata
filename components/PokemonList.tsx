@@ -32,7 +32,6 @@ export const PokemonList = () => {
             w={50}
             fit="contain"
             alt="Pokemon"
-            fallbackSrc="/images/default-pokemon.jpg"
           />
           <Flex direction="column">
             <Text fw={500}>{`${pokemon.pokemon_name} ${pokemon.form === "Normal" ? "" : pokemon.form}`}</Text>

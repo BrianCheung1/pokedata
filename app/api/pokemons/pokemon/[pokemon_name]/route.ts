@@ -6,17 +6,28 @@ const POGOAPI = "https://pogoapi.net/api/v1"
 const POKEAPI = "https://pokeapi.co/api/v2"
 
 //default cache time 5mins
-const axios = setupCache( Axios)
+const axios = setupCache(Axios)
 
 export async function GET(
   req: Request,
   { params }: { params: { pokemon_name: string } }
-) {const regex = /[^a-zA-Z♀♂]/g;
-  const pokemon_name = params.pokemon_name.split(" ")[0].replace(regex, '').toLowerCase()
+) {
+  const regex = /[^a-zA-Z.♀♂]/g
+  let pokemon_name = params.pokemon_name
+    // .split(" ")[0]
+    .replace(regex, "")
+    .toLowerCase()
 
+  if (pokemon_name === "nidoran♀") {
+    pokemon_name = "nidoran-f"
+  } else if (pokemon_name === "nidoran♂") {
+    pokemon_name = "nidoran-m"
+  } else if (pokemon_name === "mr.mime") {
+    pokemon_name = "mr-mime"
+  }
   try {
-    const pokemon_details = await getPokemonDetails(pokemon_name)
     const [
+      pokemon_details,
       type_vulnerable,
       type_effectiveness,
       pokemon_types,
@@ -30,18 +41,19 @@ export async function GET(
       evolution_family,
       cp_range,
     ] = await Promise.all([
+      getPokemonDetails(pokemon_name),
       findDualTypeDoubleDmgFrom(pokemon_name),
       findDualTypeDoubleDmgTo(pokemon_name),
-      getPokemonTypes(pokemon_details),
+      getPokemonTypes(pokemon_name),
       findDualTypeHalfDmgFrom(pokemon_name),
-      getPokemonStats(pokemon_details.id),
+      getPokemonStats(pokemon_name),
       findFlavorText(pokemon_name),
       getShiny(pokemon_name),
       findPokemonBoosted(pokemon_name),
-      findPokemonBuddy(pokemon_details.id),
+      findPokemonBuddy(pokemon_name),
       findAllMoves(pokemon_name),
       findEvolutionFamily(pokemon_name),
-      findCPRange(pokemon_details.id),
+      findCPRange(pokemon_name),
     ])
 
     return NextResponse.json(
@@ -61,8 +73,12 @@ export async function GET(
         moves: moves,
         evolution_family: evolution_family,
         cp_range: cp_range,
-        sprite: `https://img.pokemondb.net/sprites/go/normal/${pokemon_details.name}.png`,
-        sprite_shiny: `https://img.pokemondb.net/sprites/go/shiny/${pokemon_details.name}.png`,
+        sprite: pokemon_details.sprites.other.home.front_default
+          ? pokemon_details.sprites.other.home.front_default
+          : pokemon_details.sprites.other["official-artwork"].front_default,
+        sprite_shiny: pokemon_details.sprites.other.home.front_shiny
+          ? pokemon_details.sprites.other.home.front_shiny
+          : pokemon_details.sprites.other["official-artwork"].front_shiny,
       },
       { status: 200 }
     )
@@ -73,21 +89,11 @@ export async function GET(
 }
 
 async function getPokemonDetails(pokemonName: string) {
-  if (pokemonName === "nidoran♀") {
-    pokemonName = "nidoran-f"
-  } else if (pokemonName === "nidoran♂") {
-    pokemonName = "nidoran-m"
-  }
   const response = await axios.get(`${POKEAPI}/pokemon/${pokemonName}`)
   return response.data
 }
 
 async function getFlavorTextEntries(pokemonName: string) {
-  if (pokemonName === "nidoran♀") {
-    pokemonName = "nidoran-f"
-  } else if (pokemonName === "nidoran♂") {
-    pokemonName = "nidoran-m"
-  }
   const response = await axios.get(`${POKEAPI}/pokemon-species/${pokemonName}`)
   return response.data
 }
@@ -113,13 +119,6 @@ async function getTypeDoubleDmgTo(typeName: string) {
   )
 }
 
-async function getTypeHalfDmgTo(typeName: string) {
-  const response = await axios.get(`${POKEAPI}/type/${typeName}`)
-  return response.data.damage_relations.double_damage_to.map(
-    (type: { name: string }) => type.name
-  )
-}
-
 async function getNoDmgFrom(typeName: string) {
   const response = await axios.get(`${POKEAPI}/type/${typeName}`)
   return response.data.damage_relations.no_damage_from.map(
@@ -138,21 +137,23 @@ async function getChargedMove(moveName: string) {
 }
 
 async function getEvolutions(pokemonName: string) {
-  if (pokemonName === "nidoran♀") {
-    pokemonName = "nidoran-f"
-  } else if (pokemonName === "nidoran♂") {
-    pokemonName = "nidoran-m"
-  }
-  const response = await axios.get(`${POKEAPI}/pokemon-species/${pokemonName}`)
-  const response2 = await axios.get(response.data.evolution_chain.url)
+  const speciesResponse = await axios.get(
+    `${POKEAPI}/pokemon-species/${pokemonName}`
+  )
+  const evolutionChainResponse = await axios.get(
+    speciesResponse.data.evolution_chain.url
+  )
   function getAllEvolutions(evolutionChain: { chain: any }) {
     const evolutions: { name: any; sprite: any }[] = []
 
     async function traverseChain(chain: { species: any; evolves_to: any }) {
       const currentSpecies = chain.species
+      const pokemon_details = await getPokemonDetails(currentSpecies.name)
       evolutions.push({
         name: currentSpecies.name,
-        sprite: `https://img.pokemondb.net/sprites/go/normal/${currentSpecies.name}.png`,
+        sprite: pokemon_details.sprites.other.home.front_default
+          ? pokemon_details.sprites.other.home.front_default
+          : pokemon_details.sprites.other["official-artwork"].front_default,
       })
 
       if (chain.evolves_to) {
@@ -166,15 +167,15 @@ async function getEvolutions(pokemonName: string) {
     return evolutions
   }
 
-  return getAllEvolutions(response2.data)
+  return getAllEvolutions(evolutionChainResponse.data)
 }
 
 async function getCurrentMoves(pokemonName: string) {
   const response = await axios.get(`${POGOAPI}/current_pokemon_moves.json? `)
   const pokemonDetails = await getPokemonDetails(pokemonName)
-  const pokemonTypes = await getPokemonTypes(pokemonDetails)
+  const pokemonTypes = await getPokemonTypes(pokemonName)
   const pokemonMoves = response.data.find(
-    (pokemon: { pokemon_id: number}) =>
+    (pokemon: { pokemon_id: number }) =>
       pokemon.pokemon_id === pokemonDetails.id
   )
   if (pokemonMoves.cached) return pokemonMoves
@@ -268,7 +269,8 @@ async function getCurrentMoves(pokemonName: string) {
   return pokemonMoves
 }
 
-function getPokemonTypes(pokemon: { types: { type: { name: string } }[] }) {
+async function getPokemonTypes(pokemon_name: string) {
+  const pokemon = await getPokemonDetails(pokemon_name)
   return pokemon.types.map((type: { type: { name: string } }) => type.type.name)
 }
 
@@ -278,17 +280,23 @@ async function getShiny(pokemon_name: string) {
   return response.data[Number(pokemon_details.id)]
 }
 
-async function getPokemonStats(id: number) {
-  const response = await axios.get(`${POGOAPI}/pokemon_stats.json`)
-  const response2 = await axios.get(`${POGOAPI}/pokemon_max_cp.json`)
-  let stats = response.data.find(
+async function getPokemonStats(pokemon_name: string) {
+  const pokemon_details = await getPokemonDetails(pokemon_name)
+  const [statsResponse, maxCPResponse] = await Promise.all([
+    axios.get(`${POGOAPI}/pokemon_stats.json`),
+    axios.get(`${POGOAPI}/pokemon_max_cp.json`),
+  ])
+  const stats = statsResponse.data.find(
     (pokemon: { pokemon_id: number; form: string }) =>
-      pokemon.pokemon_id === id
+      pokemon.pokemon_id === pokemon_details.id
   )
-  stats.max_cp = response2.data.find(
+  const maxCP = maxCPResponse.data.find(
     (pokemon: { pokemon_id: number; form: string }) =>
-    pokemon.pokemon_id === id
-  ).max_cp
+      pokemon.pokemon_id === pokemon_details.id
+  )
+
+  stats.max_cp = maxCP.max_cp
+
   return stats
 }
 
@@ -296,15 +304,14 @@ async function getCPMultiplier() {
   const response = await axios.get(`${POGOAPI}/cp_multiplier.json`)
   return response.data
 }
-async function findPokemonBuddy(id: number) {
+
+async function findPokemonBuddy(pokemon_name: string) {
   try {
+    const pokemon_details = await getPokemonDetails(pokemon_name)
     const response = await axios.get(`${POGOAPI}/pokemon_buddy_distances.json`)
     return Object.values(response.data)
       .flat()
-      .find(
-        (pokemon: any) =>
-          pokemon.pokemon_id === id
-      )
+      .find((pokemon: any) => pokemon.pokemon_id === pokemon_details.id)
   } catch (error) {
     return NextResponse.json(
       { msg: "findPokemonBuddy Error", error },
@@ -316,19 +323,13 @@ async function findPokemonBuddy(id: number) {
 async function findPokemonBoosted(pokemonName: string) {
   try {
     const response = await axios.get(`${POGOAPI}/weather_boosts.json`)
-    const pokemonDetails = await getPokemonDetails(pokemonName)
-    const pokemonTypes = await getPokemonTypes(pokemonDetails)
+    const pokemonTypes = await getPokemonTypes(pokemonName)
     const [type1, type2] = pokemonTypes
-    let filteredWeather: string[] = []
-
-    for (const weather in response.data) {
-      if (
+    const filteredWeather = Object.keys(response.data).filter(
+      (weather) =>
         response.data[weather].includes(capitalize(type1)) ||
         response.data[weather].includes(capitalize(type2))
-      ) {
-        filteredWeather.push(weather)
-      }
-    }
+    )
     return filteredWeather
   } catch (error) {
     return NextResponse.json(
@@ -340,38 +341,33 @@ async function findPokemonBoosted(pokemonName: string) {
 
 async function findDualTypeDoubleDmgFrom(pokemonName: string) {
   try {
-    const pokemonDetails = await getPokemonDetails(pokemonName)
-    const pokemonTypes = await getPokemonTypes(pokemonDetails)
-
-    // Assuming a Pokemon can have two types
-    if (pokemonTypes.length === 2) {
-      const [type1, type2] = pokemonTypes
-      const doubleDamageFrom1 = await getTypeDoubleDmgFrom(type1)
-      const doubleDamageFrom2 = await getTypeDoubleDmgFrom(type2)
-
-      const halfDamageFrom1 = await getTypeHalfDmgFrom(type1)
-      const halfDamageFrom2 = await getTypeHalfDmgFrom(type2)
-
-      const noDamageFrom1 = await getNoDmgFrom(type1)
-      const noDamageFrom2 = await getNoDmgFrom(type2)
-
-      const dualTypeVulnerable = [
-        ...doubleDamageFrom1,
-        ...doubleDamageFrom2,
-      ].filter(
-        (val) =>
-          !halfDamageFrom1.includes(val) &&
-          !halfDamageFrom2.includes(val) &&
-          !noDamageFrom1.includes(val) &&
-          !noDamageFrom2.includes(val)
-      )
-
-      return Array.from(new Set(dualTypeVulnerable))
-    } else {
-      const [type] = pokemonTypes
+    const pokemonTypes = await getPokemonTypes(pokemonName)
+    const doubleDmgFromPromise = async (type: string) => {
       const doubleDamageFrom = await getTypeDoubleDmgFrom(type)
       return doubleDamageFrom
     }
+    const halfDmgFromPromise = async (type: string) => {
+      const halfDamageFrom = await getTypeHalfDmgFrom(type)
+      return halfDamageFrom
+    }
+    const noDmgFromPromise = async (type: string) => {
+      const noDamageFrom = await getNoDmgFrom(type)
+      return noDamageFrom
+    }
+
+    const [double_dmg, half_dmg, no_dmg] = await Promise.all([
+      Promise.all(pokemonTypes.map(doubleDmgFromPromise)),
+      Promise.all(pokemonTypes.map(halfDmgFromPromise)),
+      Promise.all(pokemonTypes.map(noDmgFromPromise)),
+    ])
+
+    let dualTypeVulnerable = double_dmg
+      .flat()
+      .filter(
+        (val) => !half_dmg.flat().includes(val) && !no_dmg.flat().includes(val)
+      )
+
+    return Array.from(new Set(dualTypeVulnerable.flat()))
   } catch (error) {
     return NextResponse.json(
       { msg: "findDualTypeDoubleDmgFrom Error", error },
@@ -379,33 +375,16 @@ async function findDualTypeDoubleDmgFrom(pokemonName: string) {
     )
   }
 }
+
 async function findDualTypeDoubleDmgTo(pokemonName: string) {
   try {
-    const pokemonDetails = await getPokemonDetails(pokemonName)
-    const pokemonTypes = await getPokemonTypes(pokemonDetails)
+    const pokemonTypes = await getPokemonTypes(pokemonName)
+    const doubleDmgToPromise = async (type: string) => ({
+      [type]: await getTypeDoubleDmgTo(type),
+    })
 
-    // Assuming a Pokemon can have two types
-    if (pokemonTypes.length === 2) {
-      const [type1, type2] = pokemonTypes
-      const doubleDmgTo1 = await getTypeDoubleDmgTo(type1)
-      const doubleDmgTo2 = await getTypeDoubleDmgTo(type2)
-
-      const dualTypeStrength = {
-        [type1]: doubleDmgTo1,
-        [type2]: doubleDmgTo2,
-      }
-
-      return dualTypeStrength
-    } else {
-      const [type] = pokemonTypes
-      const doubleDmgTo1 = await getTypeDoubleDmgTo(type)
-
-      const doubleDmgTo = {
-        [type]: doubleDmgTo1,
-      }
-
-      return doubleDmgTo
-    }
+    const double_dmg = await Promise.all(pokemonTypes.map(doubleDmgToPromise))
+    return Object.assign({}, ...double_dmg)
   } catch (error) {
     return NextResponse.json(
       { msg: "findDualTypeDoubleDmgTo error", error },
@@ -416,38 +395,36 @@ async function findDualTypeDoubleDmgTo(pokemonName: string) {
 
 async function findDualTypeHalfDmgFrom(pokemonName: string) {
   try {
-    const pokemonDetails = await getPokemonDetails(pokemonName)
-    const pokemonTypes = await getPokemonTypes(pokemonDetails)
+    const pokemonTypes = await getPokemonTypes(pokemonName)
 
-    // Assuming a Pokemon can have two types
-    if (pokemonTypes.length === 2) {
-      const [type1, type2] = pokemonTypes
-      const doubleDamageFrom1 = await getTypeDoubleDmgFrom(type1)
-      const doubleDamageFrom2 = await getTypeDoubleDmgFrom(type2)
-
-      const halfDamageFrom1 = await getTypeHalfDmgFrom(type1)
-      const halfDamageFrom2 = await getTypeHalfDmgFrom(type2)
-
-      const noDamageFrom1 = await getNoDmgFrom(type1)
-      const noDamageFrom2 = await getNoDmgFrom(type2)
-
-      let dualTypeResistant = [...halfDamageFrom1, ...halfDamageFrom2].filter(
-        (val) =>
-          !doubleDamageFrom1.includes(val) && !doubleDamageFrom2.includes(val)
-      )
-
-      dualTypeResistant = [
-        ...dualTypeResistant,
-        ...noDamageFrom1,
-        ...noDamageFrom2,
-      ]
-
-      return Array.from(new Set(dualTypeResistant))
-    } else {
-      const [type] = pokemonTypes
+    const doubleDmgFromPromise = async (type: string) => {
+      const doubleDamageFrom = await getTypeDoubleDmgFrom(type)
+      return doubleDamageFrom
+    }
+    const halfDmgFromPromise = async (type: string) => {
       const halfDamageFrom = await getTypeHalfDmgFrom(type)
       return halfDamageFrom
     }
+    const noDmgFromPromise = async (type: string) => {
+      const noDamageFrom = await getNoDmgFrom(type)
+      return noDamageFrom
+    }
+
+    const [double_dmg, half_dmg, no_dmg] = await Promise.all([
+      Promise.all(pokemonTypes.map(doubleDmgFromPromise)),
+      Promise.all(pokemonTypes.map(halfDmgFromPromise)),
+      Promise.all(pokemonTypes.map(noDmgFromPromise)),
+    ])
+
+    let dualTypeResistant = half_dmg
+      .flat()
+      .filter((val) => !double_dmg.flat().includes(val))
+    const hasNonEmptyArray = no_dmg.flat().some((arr) => arr.length > 0)
+    if (hasNonEmptyArray) {
+      dualTypeResistant = [...dualTypeResistant, ...no_dmg]
+    }
+
+    return Array.from(new Set(dualTypeResistant.flat()))
   } catch (error) {
     return NextResponse.json(
       { msg: "findDualTypeHalfDmgFrom error", error },
@@ -496,10 +473,12 @@ async function findEvolutionFamily(pokemonName: string) {
   }
 }
 
-async function findCPRange(id: number) {
+async function findCPRange(pokemon_name: string) {
   try {
-    const pokemonStats = await getPokemonStats(id)
-    let CPMultiplier = await getCPMultiplier()
+    const [pokemonStats, CPMultiplier] = await Promise.all([
+      getPokemonStats(pokemon_name),
+      getCPMultiplier(),
+    ])
     CPMultiplier.push({ level: 45.5, multiplier: 0.81779999 })
     CPMultiplier.push({ level: 46, multiplier: 0.82029999 })
     CPMultiplier.push({ level: 46.5, multiplier: 0.82279999 })
@@ -511,27 +490,25 @@ async function findCPRange(id: number) {
     CPMultiplier.push({ level: 49.5, multiplier: 0.83779999 })
     CPMultiplier.push({ level: 50, multiplier: 0.84029999 })
     CPMultiplier.push({ level: 50.5, multiplier: 0.84279999 })
-    let data: any = []
-    CPMultiplier.map((cp: { level: number; multiplier: number }) => {
-      if (Number.isInteger(cp.level)) {
-        data.push({
-          level: cp.level,
-          range: `${Math.floor(
-            (pokemonStats.base_attack *
-              Math.pow(pokemonStats.base_defense, 0.5) *
-              Math.pow(pokemonStats.base_stamina, 0.5) *
-              Math.pow(cp.multiplier, 2)) /
-              10
-          )}-${Math.floor(
-            ((pokemonStats.base_attack + 15) *
-              Math.pow(pokemonStats.base_defense + 15, 0.5) *
-              Math.pow(pokemonStats.base_stamina + 15, 0.5) *
-              Math.pow(cp.multiplier, 2)) /
-              10
-          )}`,
-        })
-      }
-    })
+    const data = CPMultiplier.filter(
+      (cp: { level: number; multiplier: number }) => Number.isInteger(cp.level)
+    ).map((cp: { level: any; multiplier: number }) => ({
+      level: cp.level,
+      range: `${Math.floor(
+        (pokemonStats.base_attack *
+          Math.pow(pokemonStats.base_defense, 0.5) *
+          Math.pow(pokemonStats.base_stamina, 0.5) *
+          Math.pow(cp.multiplier, 2)) /
+          10
+      )}-${Math.floor(
+        ((pokemonStats.base_attack + 15) *
+          Math.pow(pokemonStats.base_defense + 15, 0.5) *
+          Math.pow(pokemonStats.base_stamina + 15, 0.5) *
+          Math.pow(cp.multiplier, 2)) /
+          10
+      )}`,
+    }))
+
     return data
   } catch (error) {
     return NextResponse.json(

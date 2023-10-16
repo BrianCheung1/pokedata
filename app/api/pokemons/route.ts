@@ -3,21 +3,25 @@ import { NextResponse } from "next/server"
 
 export async function GET(req: Request) {
   try {
-    let pokemons = await axios.get(
-      "https://pogoapi.net/api/v1/pokemon_types.json"
-    )
+    const [pokemons, released_pokemons] = await Promise.all([
+      axios.get("https://pogoapi.net/api/v1/pokemon_types.json"),
+      axios.get("https://pogoapi.net/api/v1/released_pokemon.json"),
+    ]);
+
+    const normalForms = pokemons.data.filter((pokemon:{form:string}) => pokemon.form === "Normal")
 
     const filteredPokemon = pokemons.data.filter(
       (pokemon: { pokemon_id: any; form: string }) => {
-        const hasNormalForm = pokemons.data.some(
+        const hasNormalForm = normalForms.some(
           (otherPokemon: { pokemon_id: any; form: string }) =>
-            otherPokemon.pokemon_id === pokemon.pokemon_id &&
-            otherPokemon.form === "Normal"
+            otherPokemon.pokemon_id === pokemon.pokemon_id
         )
+        const released = released_pokemons.data[pokemon.pokemon_id];
 
-        return pokemon.form === "Normal" || !hasNormalForm
+        return pokemon.form === ("Normal" || !hasNormalForm) && released
       }
     )
+    
     return NextResponse.json(
       {
         msg: "Success",

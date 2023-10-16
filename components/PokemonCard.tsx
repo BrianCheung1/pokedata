@@ -146,7 +146,6 @@ export const PokemonCard: React.FC<PokemonCardProps> = ({
               c="dimmed"
               className="text-center"
             >{`"${pokemon?.pokemon_flavor_text}"`}</Text>
-            <PokemonImages pokemon={pokemon} />
             <Divider my="sm" variant="dashed" />
             <PokemonCPRange pokemon={pokemon} />
           </Card>
