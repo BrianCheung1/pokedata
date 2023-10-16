@@ -189,41 +189,29 @@ async function getCurrentMoves(pokemonName: string) {
         ? await getChargedMove(moveName)
         : await getFastMove(moveName)
       if (moveDetails && moveDetails.power && moveDetails.duration) {
+        const dps = pokemonTypes.includes(moveDetails.type.toLowerCase())
+          ? (moveDetails.power / moveDetails.duration) * 1.2 * 1000
+          : (moveDetails.power / moveDetails.duration) * 1000
+        const dpe = Math.abs(moveDetails.power / moveDetails.energy_delta)
+        const eps = (moveDetails.energy_delta / moveDetails.duration) * 1000
         return {
           name: moveDetails.name,
-          dps: pokemonTypes.includes(moveDetails.type.toLowerCase())
-            ? ((moveDetails.power / moveDetails.duration) * 1.2 * 1000).toFixed(
-                2
-              )
-            : ((moveDetails.power / moveDetails.duration) * 1000).toFixed(2),
-          dpe: Math.abs(moveDetails.power / moveDetails.energy_delta).toFixed(
-            2
-          ),
-          eps: (
-            (moveDetails.energy_delta / moveDetails.duration) *
-            1000
-          ).toFixed(2),
-
-          total: pokemonTypes.includes(moveDetails.type.toLowerCase())
-            ? (
-                (moveDetails.power / moveDetails.duration) *
-                1.2 *
-                1000 *
-                Math.abs(moveDetails.power / moveDetails.energy_delta)
-              ).toFixed(2)
-            : ((moveDetails.power / moveDetails.duration) * 1000).toFixed(2),
+          dps: dps.toFixed(2),
+          dpe: dpe.toFixed(2),
+          eps: eps.toFixed(2),
+          dps_eps: (dps * eps).toFixed(2),
+          dps_dpe: (dps * dpe).toFixed(2),
           type: moveDetails.type,
         }
       } else if (moveDetails.power === 0) {
+        const eps = (moveDetails.energy_delta / moveDetails.duration) * 1000
         return {
           name: moveDetails.name,
           dps: "0.00",
-          eps: (
-            (moveDetails.energy_delta / moveDetails.duration) *
-            1000
-          ).toFixed(2),
+          eps: eps,
           dpe: "0.00",
-          total: "0.00",
+          dps_eps: "0.00",
+          dps_dpe: "0.00",
           type: moveDetails.type,
         }
       } else {
@@ -262,11 +250,11 @@ async function getCurrentMoves(pokemonName: string) {
     ])
 
   // Update pokemonMoves object
-  pokemonMoves.fast_moves = fastMoves.sort((a, b) => b.eps - a.eps)
-  pokemonMoves.elite_fast_moves = eliteFastMoves.sort((a, b) => b.eps - a.eps)
-  pokemonMoves.charged_moves = chargedMoves.sort((a, b) => b.total - a.total)
+  pokemonMoves.fast_moves = fastMoves.sort((a, b) => b.dps_eps - a.dps_eps)
+  pokemonMoves.elite_fast_moves = eliteFastMoves.sort((a, b) => b.dps_eps - a.dps_eps)
+  pokemonMoves.charged_moves = chargedMoves.sort((a, b) => b.dps_dpe - a.dps_dpe)
   pokemonMoves.elite_charged_moves = eliteChargedMoves.sort(
-    (a, b) => b.total - a.total
+    (a, b) => b.dps_dpe - a.dps_dpe
   )
   pokemonMoves.cached = true
   return pokemonMoves
