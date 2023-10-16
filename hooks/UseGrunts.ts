@@ -12,7 +12,6 @@ const useGrunts = () => {
     data,
     error,
     isLoading,
-    mutate,
   }
 }
 

@@ -26,9 +26,7 @@ export const TeamRocketGrunts = () => {
   const [scroll, scrollTo] = useWindowScroll()
   const router = useRouter()
 
-  if (!data) return null
-
-  const renderGrunts = data.grunts.map(
+  const renderGrunts = data?.grunts?.map(
     (grunt: { name: string; team: any[]; type: string }) => (
       <Grid.Col key={grunt.name} span={{ base: 12, md: 6, xl: 4 }}>
         <Card
@@ -83,6 +81,14 @@ export const TeamRocketGrunts = () => {
     )
   )
 
+  if (isLoading) {
+    return (
+      <>
+        <Skeleton height={800} radius="xl" />
+      </>
+    )
+  }
+
   return (
     <Grid justify="center" align="stretch">
       <Affix position={{ bottom: 20, right: 20 }}>
@@ -100,7 +106,8 @@ export const TeamRocketGrunts = () => {
           )}
         </Transition>
       </Affix>
-      <Skeleton visible={isLoading}>{renderGrunts}</Skeleton>
+
+      {renderGrunts}
     </Grid>
   )
 }
