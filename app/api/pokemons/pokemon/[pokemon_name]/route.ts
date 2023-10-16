@@ -28,10 +28,8 @@ export async function GET(
   try {
     const [
       pokemon_details,
-      type_vulnerable,
-      type_effectiveness,
+      pokemon_advantages,
       pokemon_types,
-      type_resistant,
       pokemon_stats,
       pokemon_flavor_text,
       shiny,
@@ -42,10 +40,8 @@ export async function GET(
       cp_range,
     ] = await Promise.all([
       getPokemonDetails(pokemon_name),
-      findDualTypeDoubleDmgFrom(pokemon_name),
-      findDualTypeDoubleDmgTo(pokemon_name),
+      findTypeAdvantages(pokemon_name),
       getPokemonTypes(pokemon_name),
-      findDualTypeHalfDmgFrom(pokemon_name),
       getPokemonStats(pokemon_name),
       findFlavorText(pokemon_name),
       getShiny(pokemon_name),
@@ -62,9 +58,7 @@ export async function GET(
         pokemon_name: pokemon_name,
         pokemon_id: pokemon_details.id,
         pokemon_types: pokemon_types,
-        type_effectiveness: type_effectiveness,
-        type_vulnerable: type_vulnerable,
-        type_resistant: type_resistant,
+        pokemon_advantages: pokemon_advantages,
         shiny: shiny,
         pokemon_stats: pokemon_stats,
         pokemon_flavor_text: pokemon_flavor_text,
@@ -101,21 +95,14 @@ async function getFlavorTextEntries(pokemonName: string) {
 async function getTypeDoubleDmgFrom(typeName: string) {
   const response = await axios.get(`${POKEAPI}/type/${typeName}`)
   return response.data.damage_relations.double_damage_from.map(
-    (type: { name: string }) => capitalize(type.name)
+    (type: { name: string }) => ({ [capitalize(type.name)]: 1.6 })
   )
 }
 
 async function getTypeHalfDmgFrom(typeName: string) {
   const response = await axios.get(`${POKEAPI}/type/${typeName}`)
   return response.data.damage_relations.half_damage_from.map(
-    (type: { name: string }) => capitalize(type.name)
-  )
-}
-
-async function getTypeDoubleDmgTo(typeName: string) {
-  const response = await axios.get(`${POKEAPI}/type/${typeName}`)
-  return response.data.damage_relations.double_damage_to.map(
-    (type: { name: string }) => type.name
+    (type: { name: string }) => ({ [capitalize(type.name)]: 0.625 })
   )
 }
 
@@ -146,7 +133,7 @@ async function getEvolutions(pokemonName: string) {
 
   async function traverseChain(
     chain: { species: any; evolves_to: any },
-    evolutions_family: { name: string; sprite: string, sprite_shiny:string }[]
+    evolutions_family: { name: string; sprite: string; sprite_shiny: string }[]
   ) {
     const currentSpecies = chain.species
     const pokemon_details = await getPokemonDetails(currentSpecies.name)
@@ -169,7 +156,11 @@ async function getEvolutions(pokemonName: string) {
     }
   }
 
-  const evolutions_family: { name: string; sprite: string, sprite_shiny:string }[] = []
+  const evolutions_family: {
+    name: string
+    sprite: string
+    sprite_shiny: string
+  }[] = []
   await Promise.all([
     traverseChain(evolutionChainResponse.data.chain, evolutions_family),
   ])
@@ -337,7 +328,7 @@ async function findPokemonBoosted(pokemonName: string) {
   }
 }
 
-async function findDualTypeDoubleDmgFrom(pokemonName: string) {
+async function findTypeAdvantages(pokemonName: string) {
   try {
     const pokemonTypes = await getPokemonTypes(pokemonName)
     const doubleDmgFromPromise = async (type: string) => {
@@ -359,73 +350,53 @@ async function findDualTypeDoubleDmgFrom(pokemonName: string) {
       Promise.all(pokemonTypes.map(noDmgFromPromise)),
     ])
 
-    let dualTypeVulnerable = double_dmg
-      .flat()
-      .filter(
-        (val) => !half_dmg.flat().includes(val) && !no_dmg.flat().includes(val)
-      )
+    const double_dmg_from = double_dmg.flat().reduce((acc, obj) => {
+      const key = Object.keys(obj)[0]
+      const existingObj = acc.find((item: {}) => Object.keys(item)[0] === key)
 
-    return Array.from(new Set(dualTypeVulnerable.flat()))
+      existingObj ? (existingObj[key] *= obj[key]) : acc.push(obj)
+
+      return acc
+    }, [])
+
+    const half_dmg_from = half_dmg.flat().reduce((acc, obj) => {
+      const key = Object.keys(obj)[0]
+      const existingObj = acc.find((item: {}) => Object.keys(item)[0] === key)
+
+      existingObj ? (existingObj[key] *= obj[key]) : acc.push(obj)
+
+      return acc
+    }, [])
+
+    const resultArray = [...double_dmg_from, ...half_dmg_from].reduce(
+      (acc, obj) => {
+        const key = Object.keys(obj)[0]
+        const existingObj = acc.find((item: {}) => Object.keys(item)[0] === key)
+
+        existingObj
+          ? (existingObj[key] *= obj[key])
+          : acc.push({ [key]: (obj[key] * 100).toFixed(1) })
+
+        return acc
+      },
+      []
+    )
+    const filteredArray = resultArray.filter((item: {}) => {
+      const key = Object.keys(item)[0]
+      return !no_dmg.flat().includes(key)
+    })
+    const types = {
+      vulnerable: filteredArray.filter(
+        (obj: { [key: string]: number }) => Object.values(obj)[0] > 100
+      ),
+      resistant: filteredArray.filter(
+        (obj: { [key: string]: number }) => Object.values(obj)[0] < 100
+      ),
+    }
+    return types
   } catch (error) {
     return NextResponse.json(
       { msg: "findDualTypeDoubleDmgFrom Error", error },
-      { status: 500 }
-    )
-  }
-}
-
-async function findDualTypeDoubleDmgTo(pokemonName: string) {
-  try {
-    const pokemonTypes = await getPokemonTypes(pokemonName)
-    const doubleDmgToPromise = async (type: string) => ({
-      [type]: await getTypeDoubleDmgTo(type),
-    })
-
-    const double_dmg = await Promise.all(pokemonTypes.map(doubleDmgToPromise))
-    return Object.assign({}, ...double_dmg)
-  } catch (error) {
-    return NextResponse.json(
-      { msg: "findDualTypeDoubleDmgTo error", error },
-      { status: 500 }
-    )
-  }
-}
-
-async function findDualTypeHalfDmgFrom(pokemonName: string) {
-  try {
-    const pokemonTypes = await getPokemonTypes(pokemonName)
-
-    const doubleDmgFromPromise = async (type: string) => {
-      const doubleDamageFrom = await getTypeDoubleDmgFrom(type)
-      return doubleDamageFrom
-    }
-    const halfDmgFromPromise = async (type: string) => {
-      const halfDamageFrom = await getTypeHalfDmgFrom(type)
-      return halfDamageFrom
-    }
-    const noDmgFromPromise = async (type: string) => {
-      const noDamageFrom = await getNoDmgFrom(type)
-      return noDamageFrom
-    }
-
-    const [double_dmg, half_dmg, no_dmg] = await Promise.all([
-      Promise.all(pokemonTypes.map(doubleDmgFromPromise)),
-      Promise.all(pokemonTypes.map(halfDmgFromPromise)),
-      Promise.all(pokemonTypes.map(noDmgFromPromise)),
-    ])
-
-    let dualTypeResistant = half_dmg
-      .flat()
-      .filter((val) => !double_dmg.flat().includes(val))
-    const hasNonEmptyArray = no_dmg.flat().some((arr) => arr.length > 0)
-    if (hasNonEmptyArray) {
-      dualTypeResistant = [...dualTypeResistant, ...no_dmg]
-    }
-
-    return Array.from(new Set(dualTypeResistant.flat()))
-  } catch (error) {
-    return NextResponse.json(
-      { msg: "findDualTypeHalfDmgFrom error", error },
       { status: 500 }
     )
   }
@@ -490,7 +461,7 @@ async function findCPRange(pokemon_name: string) {
     CPMultiplier.push({ level: 50.5, multiplier: 0.84279999 })
     const data = CPMultiplier.filter(
       (cp: { level: number; multiplier: number }) => Number.isInteger(cp.level)
-    ).map((cp: { level: any; multiplier: number }) => ({
+    ).map((cp: { level: number; multiplier: number }) => ({
       level: cp.level,
       range: `${Math.floor(
         (pokemonStats.base_attack *

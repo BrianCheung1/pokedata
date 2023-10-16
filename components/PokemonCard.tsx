@@ -32,6 +32,7 @@ export const PokemonCard: React.FC<PokemonCardProps> = ({
   isLoading,
 }) => {
   return (
+    
     <Tabs variant="pills" defaultValue="details" className="pb-5 " >
       <Tabs.List grow justify="center" className="pb-2">
         <Tabs.Tab value="details">Details</Tabs.Tab>
@@ -40,7 +41,6 @@ export const PokemonCard: React.FC<PokemonCardProps> = ({
         <Tabs.Tab value="evolutions">Evolutions</Tabs.Tab>
         <Tabs.Tab value="cp">CP Range</Tabs.Tab>
       </Tabs.List>
-
       <Tabs.Panel value="details">
         <Skeleton visible={isLoading}>
           <Card shadow="sm" padding="lg" radius="md" withBorder bg={darken(colors[pokemon?.pokemon_types?.[0]] ? colors[pokemon?.pokemon_types?.[0]] : "blue", 0.7) }>

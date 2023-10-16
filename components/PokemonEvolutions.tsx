@@ -15,32 +15,34 @@ export const PokemonEvolutions: React.FC<PokemonEvolutionsProps> = ({
       return null // Return null if no evolutions are present
     }
 
-    return evolution_family.map((element: any) => (
-      <Stack key={element.sprite} align="center">
-        <Image
-          src={element.sprite}
-          fit="contain"
-          alt="Pokemon"
-          h={200}
-          className="cursor-pointer"
-          onClick={() => router.push(element.name)}
-        />
-        <Text size="xs" c="dimmed" className="text-center">
-          {capitalize(element.name)}
-        </Text>
-        <Image
-          src={element.sprite_shiny}
-          fit="contain"
-          alt="Pokemon"
-          h={200}
-          className="cursor-pointer"
-          onClick={() => router.push(element.name)}
-        />
-        <Text size="xs" c="dimmed" className="text-center">
-          {capitalize(element.name)} Shiny
-        </Text>
-      </Stack>
-    ))
+    return evolution_family.map(
+      (element: { sprite: string; name: string; sprite_shiny: string }) => (
+        <Stack key={element.sprite} align="center">
+          <Image
+            src={element.sprite}
+            fit="contain"
+            alt="Pokemon"
+            h={200}
+            className="cursor-pointer"
+            onClick={() => router.push(element.name)}
+          />
+          <Text size="xs" c="dimmed" className="text-center">
+            {capitalize(element.name)}
+          </Text>
+          <Image
+            src={element.sprite_shiny}
+            fit="contain"
+            alt="Pokemon"
+            h={200}
+            className="cursor-pointer"
+            onClick={() => router.push(element.name)}
+          />
+          <Text size="xs" c="dimmed" className="text-center">
+            {capitalize(element.name)} Shiny
+          </Text>
+        </Stack>
+      )
+    )
   }
 
   return (

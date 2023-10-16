@@ -60,7 +60,7 @@ export const TeamRocketGrunts = () => {
                       fallbackSrc="/images/default-pokemon.jpg"
                       loading="lazy"
                       className="cursor-pointer"
-                      onClick={()=>router.push(`pokemons/${pokemon.name}`)}
+                      onClick={() => router.push(`pokemons/${pokemon.name}`)}
                     />
                     <Text size="xs" c="dimmed" className="text-center">
                       {capitalize(pokemon.name)}
