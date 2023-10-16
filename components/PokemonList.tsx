@@ -8,14 +8,33 @@ import {
   Group,
   darken,
   Image,
+  Autocomplete,
 } from "@mantine/core"
 import { colors } from "@/libs/utils"
+import { useState, useMemo } from "react"
 
 export const PokemonList = () => {
   const { data: allPokemons = [], isLoading: isPokemonsLoading } =
     useAllPokemons()
+  const [filter, setFilter] = useState("")
 
-  const renderPokemons = allPokemons?.pokemons?.map(
+  const autocompleteData = useMemo(() => {
+    return allPokemons?.pokemons
+      ?.filter((pokemon: { form: string }) => pokemon.form === "Normal")
+      .map((pokemon: { pokemon_name: string; form: string }) => ({
+        label: pokemon.pokemon_name,
+        value: pokemon.pokemon_name + pokemon.form,
+      }));
+  }, [allPokemons]);
+
+  const filteredPokemons = useMemo(() => {
+    return allPokemons?.pokemons?.filter(
+      (pokemon: { pokemon_name: string }) =>
+        pokemon.pokemon_name.toLowerCase().includes(filter.toLowerCase())
+    );
+  }, [allPokemons, filter]);
+
+  const renderPokemons = filteredPokemons?.map(
     (pokemon: {
       pokemon_name: string
       form: string
@@ -31,7 +50,9 @@ export const PokemonList = () => {
         pokemonNameMap[pokemon.pokemon_name] ||
         pokemon.pokemon_name.toLowerCase()
 
-      const cardBgColor = darken(colors[pokemon.type[0].toLowerCase()], 0.7)
+      const cardBgColor = pokemon.type
+        ? darken(colors[pokemon.type[0].toLowerCase()], 0.7)
+        : "blue"
 
       return (
         <Card
@@ -77,8 +98,21 @@ export const PokemonList = () => {
   )
 
   return (
-    <ScrollArea h={850} type="auto" offsetScrollbars>
-      {renderPokemons}
-    </ScrollArea>
+    <>
+      <Autocomplete
+        value={filter}
+        className="flex items-center justify-center mb-5"
+        placeholder="Search Pokemon..."
+        data={autocompleteData}
+        onChange={(newValue) => setFilter(newValue)}
+        maxDropdownHeight={200}
+        onOptionSubmit={(newValue) => {
+          setFilter(newValue)
+        }}
+      />
+      <ScrollArea h={850} type="auto" offsetScrollbars>
+        {renderPokemons}
+      </ScrollArea>
+    </>
   )
 }

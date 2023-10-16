@@ -9,21 +9,31 @@ import {
   darken,
   Image,
   Title,
+  Affix,
+  Button,
+  Transition,
+  rem,
 } from "@mantine/core"
 import { colors } from "@/libs/utils"
 import { capitalize } from "@/libs/utils"
-import { useState } from "react"
+import { IconArrowUp } from "@tabler/icons-react"
 import { useRouter } from "next/navigation"
+import { useWindowScroll } from "@mantine/hooks"
 
 export const TeamRocketGrunts = () => {
   const { data, isLoading } = useGrunts()
+  const [scroll, scrollTo] = useWindowScroll()
   const router = useRouter()
 
   if (!data || isLoading) return null
 
   const renderGrunts = data.grunts.map(
     (grunt: { name: string; team: any[]; type: string }) => (
-      <Grid.Col key={grunt.name} span={{ base: 12, md: 6, lg: 4 }}>
+      <Grid.Col
+        key={grunt.name}
+        span={{ base: 12, md: 6, xl: 4 }}
+        
+      >
         <Card
           bg={darken(
             grunt.type ? colors[grunt.type.toLowerCase()] : "blue",
@@ -48,13 +58,14 @@ export const TeamRocketGrunts = () => {
               <Title order={6} className="text-center">
                 Possible Pokemon {index + 1}
               </Title>
-              <Group justify="space-evenly" className="mb-10">
+              <Group justify="space-evenly" className="mb-10" wrap="nowrap">
                 {team.map((pokemon: { name: string; sprite: string }) => (
                   <Stack key={pokemon.name}>
                     <Image
                       src={pokemon.sprite}
-                      // h={100}
-                      w={100}
+                      // h={200}
+                      h={100}
+                      // w="auto"
                       fit="contain"
                       alt="Pokemon"
                       fallbackSrc="/images/default-pokemon.jpg"
@@ -76,7 +87,22 @@ export const TeamRocketGrunts = () => {
   )
 
   return (
-    <Grid justify="center" align="center">
+    <Grid justify="center" align="stretch">
+      <Affix position={{ bottom: 20, right: 20 }}>
+        <Transition transition="slide-up" mounted={scroll.y > 0}>
+          {(transitionStyles) => (
+            <Button
+              leftSection={
+                <IconArrowUp style={{ width: rem(16), height: rem(16) }} />
+              }
+              style={transitionStyles}
+              onClick={() => scrollTo({ y: 0 })}
+            >
+              Scroll to top
+            </Button>
+          )}
+        </Transition>
+      </Affix>
       {renderGrunts}
     </Grid>
   )

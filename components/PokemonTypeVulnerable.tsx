@@ -15,28 +15,26 @@ export const PokemonTypeVulnerable: React.FC<PokemonTypeVulnerableProps> = ({
   pokemon: { pokemon_advantages },
 }) => {
   const renderTypeVulnerable = () => {
-    if (
-      !pokemon_advantages ||
-      !pokemon_advantages.vulnerable ||
-      pokemon_advantages.vulnerable.length === 0
-    ) {
+    const vulnerableArray = pokemon_advantages?.vulnerable || []
+
+    if (!vulnerableArray.length) {
       return <Badge>N/A</Badge>
     }
-    return pokemon_advantages.vulnerable
-      .sort((a, b) => {
-        const valueA = a[Object.keys(a)[0]]
-        const valueB = b[Object.keys(b)[0]]
-        return valueA - valueB
-      })
-      .map((element) => (
-        <Badge
-          key={Object.keys(element)[0]}
-          className="mr-2"
-          color={colors[Object.keys(element)[0].toLowerCase()]}
-        >
-          {Object.keys(element)[0]} {element[Object.keys(element)[0]]}%
+
+    const sortedVulnerableArray = vulnerableArray.sort(
+      (a, b) => b[Object.keys(b)[0]]-a[Object.keys(a)[0]]
+    )
+
+    return sortedVulnerableArray.map((element) => {
+      const key = Object.keys(element)[0]
+      const percentage = element[key]
+
+      return (
+        <Badge key={key} className="mr-2" color={colors[key.toLowerCase()]}>
+          {key} {percentage}%
         </Badge>
-      ))
+      )
+    })
   }
 
   return (
