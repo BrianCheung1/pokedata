@@ -143,31 +143,34 @@ async function getEvolutions(pokemonName: string) {
   const evolutionChainResponse = await axios.get(
     speciesResponse.data.evolution_chain.url
   )
-  function getAllEvolutions(evolutionChain: { chain: any }) {
-    const evolutions: { name: any; sprite: any }[] = []
 
-    async function traverseChain(chain: { species: any; evolves_to: any }) {
-      const currentSpecies = chain.species
-      const pokemon_details = await getPokemonDetails(currentSpecies.name)
-      evolutions.push({
-        name: currentSpecies.name,
-        sprite: pokemon_details.sprites.other.home.front_default
-          ? pokemon_details.sprites.other.home.front_default
-          : pokemon_details.sprites.other["official-artwork"].front_default,
-      })
+  async function traverseChain(
+    chain: { species: any; evolves_to: any },
+    evolutions_family: { name: string; sprite: string }[]
+  ) {
+    const currentSpecies = chain.species
+    const pokemon_details = await getPokemonDetails(currentSpecies.name)
+    console.log(currentSpecies.name)
 
-      if (chain.evolves_to) {
-        for (const evolution of chain.evolves_to) {
-          traverseChain(evolution)
-        }
-      }
+    evolutions_family.push({
+      name: currentSpecies.name,
+      sprite:
+        pokemon_details.sprites.other.home.front_default ||
+        pokemon_details.sprites.other["official-artwork"].front_default,
+    })
+
+    if (chain.evolves_to) {
+      await Promise.all(
+        chain.evolves_to.map(async (evolution: any) =>
+          traverseChain(evolution, evolutions_family)
+        )
+      )
     }
-
-    traverseChain(evolutionChain.chain)
-    return evolutions
   }
 
-  return getAllEvolutions(evolutionChainResponse.data)
+  const evolutions_family: { name: string; sprite: string }[] = []
+  await traverseChain(evolutionChainResponse.data.chain, evolutions_family)
+  return evolutions_family
 }
 
 async function getCurrentMoves(pokemonName: string) {
