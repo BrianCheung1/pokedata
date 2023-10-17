@@ -19,7 +19,7 @@ interface PokemonEvolutionsProps {
   pokemon: Record<string, any>
 }
 
-const ImageWithHideOnError = (props) => {
+const ImageWithHideOnError = (props: any) => {
   const [hideImage, setHideImage] = useState(false)
 
   return (
