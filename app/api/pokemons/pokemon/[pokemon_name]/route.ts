@@ -129,7 +129,10 @@ async function getEvolutions(pokemonName: string) {
   async function traverseChain(chain: { species: any; evolves_to: any }) {
     const currentSpecies = chain.species
     try {
-      const pokemon_details = await getPokemonDetails(currentSpecies.name)
+      const pokemon_url = currentSpecies.url.split("/")
+      const pokemon_id = pokemon_url[pokemon_url.length - 2]
+      const pokemon_details = await getPokemonDetails(pokemon_id)
+
       const other_forms = pokemon_details.forms.filter(
         (pokemon: { name: string }) => pokemon.name !== pokemon_details.name
       )

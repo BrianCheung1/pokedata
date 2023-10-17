@@ -40,9 +40,8 @@ export const SearchBar = () => {
               form: string
             }) => {
               return {
-                label: `${pokemon.pokemon_name} ${
-                  pokemon.form === "Normal" ? "" : pokemon.form
-                }`,
+                label: `${pokemon.pokemon_id} ${pokemon.pokemon_name}`
+                ,
                 value: `${pokemon.pokemon_id} ${pokemon.pokemon_name} ${
                   pokemon.form === "Normal" ? "" : pokemon.form
                 }`,

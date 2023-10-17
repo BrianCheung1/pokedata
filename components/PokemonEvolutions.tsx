@@ -84,6 +84,7 @@ export const PokemonEvolutions: React.FC<PokemonEvolutionsProps> = ({
           {element.other_forms.map((form) => {
             return (
               <>
+              {console.log(form)}
                 <ImageWithHideOnError
                   src={form.sprite}
                   fit="contain"
@@ -100,7 +101,7 @@ export const PokemonEvolutions: React.FC<PokemonEvolutionsProps> = ({
                   h={200}
                   className="cursor-pointer"
                   onClick={() => router.push(element.id)}
-                  name={capitalize(form.name)}
+                  name={`${capitalize(form.name)} Shiny`}
                 />
               </>
             )
@@ -130,7 +131,7 @@ export const PokemonEvolutions: React.FC<PokemonEvolutionsProps> = ({
       <Title className="text-center" order={5}>
         {capitalize(pokemon_name)} Family
       </Title>
-      <Group justify="space-around" align="center">
+      <Group justify="space-between" align="left">
         {renderEvolutions()}
       </Group>
     </>
