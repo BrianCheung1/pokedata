@@ -10,7 +10,7 @@ interface Grunt {
     type: { name: string }
   }
   lineup: {
-    team: { template: string }[][]
+    team: { id: string }[][]
   }
 }
 
@@ -33,9 +33,7 @@ export async function GET(req: Request) {
     const gruntLineUpDetails = await Promise.all(
       gruntsActive.map(async (grunt) => {
         const gruntTeams = grunt.lineup.team.map((team) =>
-          team.map((pokemon) =>
-            pokemon.template.replace("_NORMAL", "").toLowerCase()
-          )
+          team.map((pokemon) => pokemon.id)
         )
 
         const pokemonDetails = await getPokemonDetails(gruntTeams)
@@ -70,8 +68,11 @@ async function getPokemonDetails(
       flattenTeams.map(async (pokemonName) => {
         const response = await axios.get(`${POKEAPI}/pokemon/${pokemonName}`)
         return {
+          id: response.data.id,
           name: response.data.name,
-          sprite: `https://img.pokemondb.net/sprites/go/normal/${response.data.name}.png`,
+          sprite:
+            response.data.sprites.other.home.front_default ||
+            response.data.sprites.other["official-artwork"].front_default,
         }
       })
     )

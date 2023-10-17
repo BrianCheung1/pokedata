@@ -31,7 +31,7 @@ export const TeamRocketGrunts = () => {
       <Grid.Col key={grunt.name} span={{ base: 12, md: 6, xl: 4 }}>
         <Card
           bg={darken(
-            grunt.type ? colors[grunt.type.toLowerCase()] : "blue",
+            grunt.type ? colors[grunt.type.toLowerCase()] : "yellow",
             0.7
           )}
           withBorder
@@ -54,25 +54,27 @@ export const TeamRocketGrunts = () => {
                 Possible Pokemon {index + 1}
               </Title>
               <Group justify="space-evenly" className="mb-10" wrap="nowrap">
-                {team.map((pokemon: { name: string; sprite: string }) => (
-                  <Stack key={pokemon.name}>
-                    <Image
-                      src={pokemon.sprite}
-                      // h={200}
-                      h={100}
-                      // w="auto"
-                      fit="contain"
-                      alt="Pokemon"
-                      fallbackSrc="/images/default-pokemon.jpg"
-                      loading="lazy"
-                      className="cursor-pointer"
-                      onClick={() => router.push(`pokemons/${pokemon.name}`)}
-                    />
-                    <Text size="xs" c="dimmed" className="text-center">
-                      {capitalize(pokemon.name)}
-                    </Text>
-                  </Stack>
-                ))}
+                {team.map(
+                  (pokemon: { name: string; sprite: string; id: string }) => (
+                    <Stack key={pokemon.name}>
+                      <Image
+                        src={pokemon.sprite}
+                        // h={200}
+                        h={100}
+                        // w="auto"
+                        fit="contain"
+                        alt="Pokemon"
+                        fallbackSrc="/images/default-pokemon.jpg"
+                        loading="lazy"
+                        className="cursor-pointer"
+                        onClick={() => router.push(`pokemons/${pokemon.id}`)}
+                      />
+                      <Text size="xs" c="dimmed" className="text-center">
+                        {capitalize(pokemon.name)}
+                      </Text>
+                    </Stack>
+                  )
+                )}
               </Group>
             </Stack>
           ))}

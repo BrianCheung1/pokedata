@@ -2,7 +2,6 @@ import {
   Text,
   Image,
   Group,
-  Title,
   Stack,
   Affix,
   Transition,
@@ -63,8 +62,8 @@ export const PokemonEvolutions: React.FC<PokemonEvolutionsProps> = ({
             src={element.sprite}
             fit="contain"
             alt="Pokemon"
-            h={200}
             className="cursor-pointer"
+            h="10rem"
             onClick={() => router.push(element.id)}
           />
           <Text size="xs" c="dimmed" className="text-center">
@@ -74,7 +73,7 @@ export const PokemonEvolutions: React.FC<PokemonEvolutionsProps> = ({
             src={element.sprite_shiny}
             fit="contain"
             alt="Pokemon"
-            h={200}
+            h="10rem"
             className="cursor-pointer"
             onClick={() => router.push(element.id)}
           />
@@ -89,7 +88,7 @@ export const PokemonEvolutions: React.FC<PokemonEvolutionsProps> = ({
                   src={form.sprite}
                   fit="contain"
                   alt="Pokemon"
-                  h={200}
+                  h="15rem"
                   className="cursor-pointer"
                   onClick={() => router.push(element.id)}
                   name={capitalize(form.name)}
@@ -98,7 +97,7 @@ export const PokemonEvolutions: React.FC<PokemonEvolutionsProps> = ({
                   src={form.sprite_shiny}
                   fit="contain"
                   alt="Pokemon"
-                  h={200}
+                  h="15rem"
                   className="cursor-pointer"
                   onClick={() => router.push(element.id)}
                   name={`${capitalize(form.name)} Shiny`}
@@ -128,10 +127,7 @@ export const PokemonEvolutions: React.FC<PokemonEvolutionsProps> = ({
           )}
         </Transition>
       </Affix>
-      <Title className="text-center" order={5}>
-        {capitalize(pokemon_name)} Family
-      </Title>
-      <Group justify="space-between" align="left">
+      <Group justify="space-around" align="left">
         {renderEvolutions()}
       </Group>
     </>

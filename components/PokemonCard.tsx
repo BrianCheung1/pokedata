@@ -93,11 +93,7 @@ export const PokemonCard: React.FC<PokemonCardProps> = ({
             <Title className="text-center" order={1}>
               {capitalize(pokemon?.pokemon_name)}
             </Title>
-            <Text
-              size="xs"
-              c="dimmed"
-              className="text-center"
-            >{`"${pokemon?.pokemon_flavor_text}"`}</Text>
+
             <Divider my="sm" variant="dashed" />
             <PokemonShiny pokemon={pokemon} />
           </Card>
@@ -109,11 +105,6 @@ export const PokemonCard: React.FC<PokemonCardProps> = ({
             <Title className="text-center" order={1}>
               {capitalize(pokemon?.pokemon_name)}
             </Title>
-            <Text
-              size="xs"
-              c="dimmed"
-              className="text-center"
-            >{`"${pokemon?.pokemon_flavor_text}"`}</Text>
             <Divider my="sm" variant="dashed" />
             <PokemonMoves pokemon={pokemon} />
           </Card>
@@ -125,11 +116,6 @@ export const PokemonCard: React.FC<PokemonCardProps> = ({
             <Title className="text-center" order={1}>
               {capitalize(pokemon?.pokemon_name)}
             </Title>
-            <Text
-              size="xs"
-              c="dimmed"
-              className="text-center"
-            >{`"${pokemon?.pokemon_flavor_text}"`}</Text>
             <Divider my="sm" variant="dashed" />
             <PokemonEvolutions pokemon={pokemon} />
           </Card>
@@ -141,11 +127,6 @@ export const PokemonCard: React.FC<PokemonCardProps> = ({
             <Title className="text-center" order={1}>
               {capitalize(pokemon?.pokemon_name)}
             </Title>
-            <Text
-              size="xs"
-              c="dimmed"
-              className="text-center"
-            >{`"${pokemon?.pokemon_flavor_text}"`}</Text>
             <Divider my="sm" variant="dashed" />
             <PokemonCPRange pokemon={pokemon} />
           </Card>

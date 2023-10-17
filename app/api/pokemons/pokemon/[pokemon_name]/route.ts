@@ -450,17 +450,33 @@ async function findCPRange(pokemon_name: string) {
       getPokemonStats(pokemon_name),
       getCPMultiplier(),
     ])
-    CPMultiplier.push({ level: 45.5, multiplier: 0.81779999 })
-    CPMultiplier.push({ level: 46, multiplier: 0.82029999 })
-    CPMultiplier.push({ level: 46.5, multiplier: 0.82279999 })
-    CPMultiplier.push({ level: 47, multiplier: 0.82529999 })
-    CPMultiplier.push({ level: 47.5, multiplier: 0.82779999 })
-    CPMultiplier.push({ level: 48, multiplier: 0.83029999 })
-    CPMultiplier.push({ level: 48.5, multiplier: 0.83279999 })
-    CPMultiplier.push({ level: 49, multiplier: 0.83529999 })
-    CPMultiplier.push({ level: 49.5, multiplier: 0.83779999 })
-    CPMultiplier.push({ level: 50, multiplier: 0.84029999 })
-    CPMultiplier.push({ level: 50.5, multiplier: 0.84279999 })
+
+    const additionalCPMultipliers = [
+      { level: 45.5, multiplier: 0.81779999 },
+      { level: 46, multiplier: 0.82029999 },
+      { level: 46.5, multiplier: 0.82279999 },
+      { level: 47, multiplier: 0.82529999 },
+      { level: 47.5, multiplier: 0.82779999 },
+      { level: 48, multiplier: 0.83029999 },
+      { level: 48.5, multiplier: 0.83279999 },
+      { level: 49, multiplier: 0.83529999 },
+      { level: 49.5, multiplier: 0.83779999 },
+      { level: 50, multiplier: 0.84029999 },
+      { level: 50.5, multiplier: 0.84279999 },
+    ]
+
+    const uniqueLevels = new Set(
+      CPMultiplier.map((cp: { level: number }) => cp.level)
+    )
+
+    // Add new levels and multipliers if they don't already exist
+    additionalCPMultipliers.forEach((cp) => {
+      if (!uniqueLevels.has(cp.level)) {
+        CPMultiplier.push(cp)
+        uniqueLevels.add(cp.level)
+      }
+    })
+
     const data = CPMultiplier.filter(
       (cp: { level: number; multiplier: number }) => Number.isInteger(cp.level)
     ).map((cp: { level: number; multiplier: number }) => ({
@@ -480,6 +496,7 @@ async function findCPRange(pokemon_name: string) {
       )}`,
     }))
 
+    console.log(data.length)
     return data
   } catch (error) {
     return NextResponse.json(

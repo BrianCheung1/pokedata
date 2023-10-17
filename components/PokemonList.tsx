@@ -10,7 +10,7 @@ import {
   Image,
   TextInput,
   Pagination,
-  Skeleton
+  Skeleton,
 } from "@mantine/core"
 import { colors } from "@/libs/utils"
 import { useState, useMemo } from "react"
@@ -61,7 +61,7 @@ export const PokemonList = () => {
           radius="md"
           withBorder
           component="a"
-          href={`/pokemons/${pokemon.pokemon_name}`}
+          href={`/pokemons/${pokemon.pokemon_id}`}
           key={pokemon.pokemon_name + pokemon.form}
         >
           <Flex gap="sm" align="center">
@@ -77,9 +77,7 @@ export const PokemonList = () => {
               alt="Pokemon"
             />
             <Flex direction="column">
-              <Text fw={500}>{`${pokemon.pokemon_name} ${
-                pokemon.form === "Normal" ? "" : pokemon.form
-              }`}</Text>
+              <Text fw={500}>{`${pokemon.pokemon_name}`}</Text>
               <Text size="xs" c="dimmed">
                 #{pokemon.pokemon_id}
               </Text>
