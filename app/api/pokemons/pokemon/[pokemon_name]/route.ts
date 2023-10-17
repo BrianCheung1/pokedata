@@ -12,19 +12,7 @@ export async function GET(
   req: Request,
   { params }: { params: { pokemon_name: string } }
 ) {
-  const regex = /[^a-zA-Z.♀♂]/g
   let pokemon_name = params.pokemon_name
-    .split(" ")[0]
-    .replace(regex, "")
-    .toLowerCase()
-
-  if (pokemon_name === "nidoran♀") {
-    pokemon_name = "nidoran-f"
-  } else if (pokemon_name === "nidoran♂") {
-    pokemon_name = "nidoran-m"
-  } else if (pokemon_name === "mr.mime") {
-    pokemon_name = "mr-mime"
-  }
   try {
     const [
       pokemon_details,
@@ -55,7 +43,7 @@ export async function GET(
     return NextResponse.json(
       {
         msg: "Success",
-        pokemon_name: pokemon_name,
+        pokemon_name: pokemon_details.name,
         pokemon_id: pokemon_details.id,
         pokemon_types: pokemon_types,
         pokemon_advantages: pokemon_advantages,
@@ -131,39 +119,50 @@ async function getEvolutions(pokemonName: string) {
     speciesResponse.data.evolution_chain.url
   )
 
-  async function traverseChain(
-    chain: { species: any; evolves_to: any },
-    evolutions_family: { name: string; sprite: string; sprite_shiny: string }[]
-  ) {
-    const currentSpecies = chain.species
-    const pokemon_details = await getPokemonDetails(currentSpecies.name)
-    evolutions_family.push({
-      name: currentSpecies.name,
-      sprite:
-        pokemon_details.sprites.other.home.front_default ||
-        pokemon_details.sprites.other["official-artwork"].front_default,
-      sprite_shiny:
-        pokemon_details.sprites.other.home.front_shiny ||
-        pokemon_details.sprites.other["official-artwork"].front_shiny,
-    })
-
-    if (chain.evolves_to) {
-      await Promise.all(
-        chain.evolves_to.map(async (evolution: any) =>
-          traverseChain(evolution, evolutions_family)
-        )
-      )
-    }
-  }
-
   const evolutions_family: {
+    id: string
     name: string
     sprite: string
     sprite_shiny: string
+    other_forms: string[]
   }[] = []
-  await Promise.all([
-    traverseChain(evolutionChainResponse.data.chain, evolutions_family),
-  ])
+  async function traverseChain(chain: { species: any; evolves_to: any }) {
+    const currentSpecies = chain.species
+    try {
+      const pokemon_details = await getPokemonDetails(currentSpecies.name)
+      const other_forms = pokemon_details.forms.filter(
+        (pokemon: { name: string }) => pokemon.name !== pokemon_details.name
+      )
+      const forms = other_forms.slice(1).map((pokemon: { name: string }) => {
+        return {
+          name: pokemon.name,
+          sprite: `https://img.pokemondb.net/sprites/go/normal/${pokemon.name}.png`,
+          sprite_shiny: `https://img.pokemondb.net/sprites/go/shiny/${pokemon.name}.png`,
+        }
+      })
+      evolutions_family.push({
+        id: String(pokemon_details.id),
+        name: currentSpecies.name,
+        sprite:
+          pokemon_details.sprites.other.home.front_default ||
+          pokemon_details.sprites.other["official-artwork"].front_default,
+        sprite_shiny:
+          pokemon_details.sprites.other.home.front_shiny ||
+          pokemon_details.sprites.other["official-artwork"].front_shiny,
+        other_forms: forms,
+      })
+    } catch (error) {
+      console.log(`Error with Pokemon name ${currentSpecies.name}`)
+    }
+    await Promise.all(
+      (chain.evolves_to || []).map(async (evolution: any) =>
+        traverseChain(evolution)
+      )
+    )
+  }
+
+  await traverseChain(evolutionChainResponse.data.chain)
+
   return evolutions_family
 }
 

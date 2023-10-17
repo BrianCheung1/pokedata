@@ -7,15 +7,20 @@ import { CopyURL } from "./CopyURL"
 
 export const SearchBar = () => {
   const [value, setValue] = useState("")
-  const currentPage = decodeURIComponent(usePathname()).split("/").pop()?.split("%20")[0] || ""
+  const currentPage =
+    decodeURIComponent(usePathname()).split("/").pop()?.split("%20")[0] || ""
   const { data: allPokemons = [], isLoading: isPokemonsLoading } =
     useAllPokemons()
   const router = useRouter()
 
   useEffect(() => {
-    setValue(currentPage)
-  }, [currentPage])
+    const foundPokemon = allPokemons?.pokemons?.find(
+      (pokemon: { pokemon_id: number }) =>
+        pokemon.pokemon_id === Number(currentPage)
+    )
 
+    setValue(foundPokemon?.pokemon_name ?? "")
+  }, [allPokemons?.pokemons, currentPage])
   const handleClear = () => {
     setValue("")
   }
@@ -29,17 +34,26 @@ export const SearchBar = () => {
         data={
           !isPokemonsLoading &&
           allPokemons?.pokemons?.map(
-            (pokemon: { pokemon_name: string; form: string }) =>
-              `${pokemon.pokemon_name} ${
-                pokemon.form === "Normal" ? "" : pokemon.form
-              }`
+            (pokemon: {
+              pokemon_id: number
+              pokemon_name: string
+              form: string
+            }) => {
+              return {
+                label: `${pokemon.pokemon_name} ${
+                  pokemon.form === "Normal" ? "" : pokemon.form
+                }`,
+                value: `${pokemon.pokemon_id} ${pokemon.pokemon_name} ${
+                  pokemon.form === "Normal" ? "" : pokemon.form
+                }`,
+              }
+            }
           )
         }
         onChange={(newValue) => setValue(newValue)}
         maxDropdownHeight={200}
         onOptionSubmit={(newValue) => {
-          router.push(`/pokemons/${newValue}`)
-  
+          router.push(`/pokemons/${newValue.split(" ")[0]}`)
           setValue(newValue)
         }}
         leftSection={<CopyURL />}
