@@ -1,6 +1,6 @@
 "use client"
 import { NavLink, Box, Drawer, Burger, Container } from "@mantine/core"
-import { IconNotebook, IconSearch, IconPokeball } from "@tabler/icons-react"
+import { IconNotebook, IconSearch, IconPokeball, IconCalendarEvent } from "@tabler/icons-react"
 import { useDisclosure } from "@mantine/hooks"
 import { ColorSchemeToggle } from "./ColorSchemeToggle"
 import { usePathname, useRouter } from "next/navigation"
@@ -21,6 +21,11 @@ const data = [
     label: "Team Rocket Lineups",
     leftSection: <IconNotebook size="1rem" stroke={1.5} />,
     url: "/teamrocket",
+  },
+  {
+    label: "Events",
+    leftSection: <IconCalendarEvent size="1rem" stroke={1.5} />,
+    url: "/events",
   },
 ]
 
