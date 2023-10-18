@@ -1,5 +1,6 @@
 import axios from "axios"
 import { NextResponse } from "next/server"
+import moment from "moment-timezone"
 
 const eventsData =
   "https://raw.githubusercontent.com/ccev/pogoinfo/v2/active/events.json"
@@ -12,12 +13,14 @@ export async function GET(req: Request) {
       axios.get(eventsData),
       axios.get(leekData),
     ])
-    const currentDate = new Date()
+    const userTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    const currentDate = moment.tz(new Date().toLocaleString(), userTimezone);
+    
 
     // Function to convert date strings to Date objects
     const parseDate = (dateString: string) => {
-      const date = new Date(dateString)
-      date.setSeconds(0)
+      const date = moment.tz(dateString)
+      date.seconds(0)
       return date
     }
 
@@ -38,7 +41,7 @@ export async function GET(req: Request) {
       },
     })
 
-    events.data.forEach((obj:any) => {
+    events.data.forEach((obj: any) => {
       const key = createKey(obj)
       if (combinedObjectsMap.has(key)) {
         const combinedObject = combineObjects(combinedObjectsMap.get(key), obj)
@@ -48,7 +51,7 @@ export async function GET(req: Request) {
       }
     })
 
-    leekEvents.data.forEach((obj:any) => {
+    leekEvents.data.forEach((obj: any) => {
       const key = createKey(obj)
       if (combinedObjectsMap.has(key)) {
         const combinedObject = combineObjects(combinedObjectsMap.get(key), obj)
@@ -63,8 +66,8 @@ export async function GET(req: Request) {
 
     const activeEvents = combinedObjectsArray
       .filter((event: { start: string; end: string }) => {
-        const eventStartDate = new Date(event.start)
-        const eventEndDate = new Date(event.end)
+        const eventStartDate = moment.tz(event.start)
+        const eventEndDate = moment.tz(event.end)
 
         // Check if the current date is within the event's start and end dates
         return currentDate >= eventStartDate && currentDate <= eventEndDate
@@ -76,7 +79,7 @@ export async function GET(req: Request) {
 
     const upcomingEvents = combinedObjectsArray
       .filter((event: { start: string }) => {
-        const eventStartDate = new Date(event.start)
+        const eventStartDate = moment.tz(event.start)
 
         // Check if the current date is before the event's start date
         return currentDate < eventStartDate
@@ -90,6 +93,7 @@ export async function GET(req: Request) {
       {
         msg: "Success",
         time: currentDate,
+        timeZone: userTimezone,
         active_events: activeEvents,
         upcoming_events: upcomingEvents,
       },
