@@ -13,7 +13,7 @@ export async function GET(req: Request) {
       axios.get(eventsData),
       axios.get(leekData),
     ])
-    const userTimezone = req.url.split("=").pop() as string
+    const userTimezone = decodeURIComponent( req.url).split("=").pop() as string
     const currentDate = moment.tz(userTimezone)
 
     // Function to convert date strings to Date objects
