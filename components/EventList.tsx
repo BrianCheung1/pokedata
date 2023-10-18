@@ -11,7 +11,9 @@ import useEvents from "@/hooks/useEvents"
 import { useEffect, useState } from "react"
 
 export const EventList = () => {
-  const { data, isLoading } = useEvents()
+  const userTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone
+  const { data, isLoading } = useEvents(userTimezone)
+
   const [currentTime, setCurrentTime] = useState(new Date())
 
   useEffect(() => {

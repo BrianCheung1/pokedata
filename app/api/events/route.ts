@@ -9,14 +9,14 @@ const leekData =
   "https://raw.githubusercontent.com/bigfoott/ScrapedDuck/data/events.json"
 export async function GET(req: Request) {
   try {
+
     const [events, leekEvents] = await Promise.all([
       axios.get(eventsData),
       axios.get(leekData),
     ])
-    const userTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-    const currentDate = moment.tz(new Date().toLocaleString(), userTimezone);
-    
-
+    const userTimezone = req.url.split("=").pop() as string
+    const currentDate = moment.tz(new Date(), userTimezone);
+  
     // Function to convert date strings to Date objects
     const parseDate = (dateString: string) => {
       const date = new Date(dateString)
