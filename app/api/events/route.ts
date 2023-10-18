@@ -89,6 +89,7 @@ export async function GET(req: Request) {
     return NextResponse.json(
       {
         msg: "Success",
+        time: currentDate,
         active_events: activeEvents,
         upcoming_events: upcomingEvents,
       },

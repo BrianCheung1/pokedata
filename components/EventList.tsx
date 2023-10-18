@@ -8,7 +8,7 @@ import {
   Image,
 } from "@mantine/core"
 import useEvents from "@/hooks/useEvents"
-import {useEffect, useState} from "react"
+import { useEffect, useState } from "react"
 
 export const EventList = () => {
   const { data, isLoading } = useEvents()
@@ -180,7 +180,7 @@ export const EventList = () => {
 
   return (
     <>
-      <Title>Active Events {currentTime.toString()}</Title>
+      <Title>Active Events </Title>
       <Accordion> {renderActiveEvents}</Accordion>
       <Title>Upcoming Events</Title>
       <Accordion>{renderUpcomingEvents}</Accordion>
