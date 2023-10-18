@@ -1,27 +1,36 @@
 import {
   Card,
-  Image,
   Text,
-  Badge,
-  Button,
   Group,
-  ScrollArea,
-  Flex,
-  darken,
-  TextInput,
-  Pagination,
-  Skeleton,
   Accordion,
   Title,
+  Stack,
+  Image,
 } from "@mantine/core"
 import useEvents from "@/hooks/useEvents"
-import { capitalize } from "@/libs/utils"
 
 export const EventList = () => {
   const { data, isLoading } = useEvents()
 
+  const formatDate = (date: string) => {
+    const newDate = new Date(date)
+    const formattedDate = newDate
+      .toLocaleString("en-US", {
+        weekday: "short",
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+        hour: "2-digit",
+        minute: "2-digit",
+        hour12: true,
+      })
+      .replace(/,/g, "")
+
+    return formattedDate
+  }
+
   const formatTime = (days: number, hours: number, minutes: number) => {
-    return days > 1 ? `${days}d ${hours}h` : `${hours}h ${minutes}m`
+    return days >= 1 ? `${days}d ${hours}h` : `${hours}h ${minutes}m`
   }
 
   const eventEnds = (startDate: string, endDate: string) => {
@@ -44,9 +53,14 @@ export const EventList = () => {
     const label = currentTime < startTime ? "Starts in" : "Ends in"
 
     return (
-      <Text size="sm" c="dimmed">
-        {label} {formatTime(days, hours, minutes)}
-      </Text>
+      <div className="ml-auto mr-5 flex flex-col items-center justify-center">
+        <Text size="sm" c="dimmed">
+          {label}
+        </Text>
+        <Text size="sm" c="dimmed">
+          {formatTime(days, hours, minutes)}
+        </Text>
+      </div>
     )
   }
 
@@ -55,24 +69,88 @@ export const EventList = () => {
     start: string
     end: string
     bonuses: [{ text: string; template: string }]
+    extraData: any
   }) => (
     <Accordion.Item key={event.name} value={event.name}>
       <Accordion.Control>
-        {event.name}
-        <Text size="sm" c="dimmed">
-          End Date: {event.end}
-        </Text>
-        {eventEnds(event.start, event.end)}
+        <Group wrap="nowrap">
+          <div>
+            {event.name}
+            <Text size="sm" c="dimmed">
+              End Date: {formatDate(event.end)}
+            </Text>
+          </div>
+          {eventEnds(event.start, event.end)}
+        </Group>
       </Accordion.Control>
       <Accordion.Panel>
         <Card bg="none">
           <Text>
-            {event.bonuses.length > 0 && `Bonuses:`}
+            {event.bonuses?.length > 0 && `Bonuses:`}
             {event.bonuses?.map((bonus) => (
               <Text key={bonus.text} size="sm" c="dimmed">
                 {bonus.text}
               </Text>
             ))}
+            {event.extraData?.raidbattles?.bosses?.map(
+              (
+                boss: { image: string; canBeShiny: boolean; name: string },
+                index: number
+              ) => (
+                <Group key={boss.name}>
+                  <Image
+                    src={boss.image}
+                    alt="boss"
+                    fit="contain"
+                    h={100}
+                    w="auto"
+                  />
+                  {event.extraData?.raidbattles?.shinies?.[index] && (
+                    <Image
+                      src={event.extraData.raidbattles.shinies[index].image}
+                      alt={`shiny-${index}`}
+                      fit="contain"
+                      h={100}
+                      w="auto"
+                    />
+                  )}
+                  <Text>
+                    Can be Shiny: {boss.canBeShiny ? "True" : "False"}
+                  </Text>
+                </Group>
+              )
+            )}
+            {event.extraData?.spotlight && (
+              <>
+                <Text size="sm" c="dimmed">
+                  {event.extraData.spotlight.name}
+                </Text>
+                <Text size="sm" c="dimmed">
+                  {event.extraData.spotlight.bonus}
+                </Text>
+                <Image
+                  src={event.extraData.spotlight.image}
+                  alt="spotlight"
+                  fit="contain"
+                  h={100}
+                  w="auto"
+                />
+              </>
+            )}
+            {event.extraData?.communityday && (
+              <>
+                {event.extraData.communityday.spawns?.map(
+                  (spawn: { name: string }) => (
+                    <Text key={spawn.name} size="sm" c="dimmed">
+                      {spawn.name}
+                    </Text>
+                  )
+                )}
+                <Text size="sm" c="dimmed">
+                  {event.extraData.communityday.bonusDisclaimers}
+                </Text>
+              </>
+            )}
           </Text>
         </Card>
       </Accordion.Panel>
