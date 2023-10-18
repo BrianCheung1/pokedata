@@ -8,9 +8,21 @@ import {
   Image,
 } from "@mantine/core"
 import useEvents from "@/hooks/useEvents"
+import {useEffect, useState} from "react"
 
 export const EventList = () => {
   const { data, isLoading } = useEvents()
+  const [currentTime, setCurrentTime] = useState(new Date())
+
+  useEffect(() => {
+    // Update the current time every minute
+    const intervalId = setInterval(() => {
+      setCurrentTime(new Date())
+    }, 60000) // 60000 milliseconds = 1 minute
+
+    // Clear the interval on component unmount to avoid memory leaks
+    return () => clearInterval(intervalId)
+  }, []) // The empty dependency array ensures that the effect runs only once on mount
 
   const formatDate = (date: string) => {
     const newDate = new Date(date)
@@ -36,7 +48,6 @@ export const EventList = () => {
   const eventEnds = (startDate: string, endDate: string) => {
     const startTime = new Date(startDate)
     const endTime = new Date(endDate)
-    const currentTime = new Date()
 
     const timeDifference =
       currentTime < startTime
@@ -97,27 +108,29 @@ export const EventList = () => {
                 boss: { image: string; canBeShiny: boolean; name: string },
                 index: number
               ) => (
-                <Group key={boss.name}>
-                  <Image
-                    src={boss.image}
-                    alt="boss"
-                    fit="contain"
-                    h={100}
-                    w="auto"
-                  />
-                  {event.extraData?.raidbattles?.shinies?.[index] && (
+                <Stack key={boss.name} align="center">
+                  <Group>
                     <Image
-                      src={event.extraData.raidbattles.shinies[index].image}
-                      alt={`shiny-${index}`}
+                      src={boss.image}
+                      alt="boss"
                       fit="contain"
                       h={100}
                       w="auto"
                     />
-                  )}
+                    {event.extraData?.raidbattles?.shinies?.[index] && (
+                      <Image
+                        src={event.extraData.raidbattles.shinies[index].image}
+                        alt={`shiny-${index}`}
+                        fit="contain"
+                        h={100}
+                        w="auto"
+                      />
+                    )}
+                  </Group>
                   <Text>
                     Can be Shiny: {boss.canBeShiny ? "True" : "False"}
                   </Text>
-                </Group>
+                </Stack>
               )
             )}
             {event.extraData?.spotlight && (
@@ -151,6 +164,11 @@ export const EventList = () => {
                 </Text>
               </>
             )}
+            {!event.bonuses && !event.extraData && (
+              <Text size="sm" c="dimmed">
+                N/A
+              </Text>
+            )}
           </Text>
         </Card>
       </Accordion.Panel>
@@ -162,7 +180,7 @@ export const EventList = () => {
 
   return (
     <>
-      <Title>Active Events</Title>
+      <Title>Active Events {currentTime.toString()}</Title>
       <Accordion> {renderActiveEvents}</Accordion>
       <Title>Upcoming Events</Title>
       <Accordion>{renderUpcomingEvents}</Accordion>
