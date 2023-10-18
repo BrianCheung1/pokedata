@@ -19,8 +19,8 @@ export async function GET(req: Request) {
 
     // Function to convert date strings to Date objects
     const parseDate = (dateString: string) => {
-      const date = moment.tz(dateString)
-      date.seconds(0)
+      const date = new Date(dateString)
+      date.setSeconds(0)
       return date
     }
 
@@ -66,11 +66,11 @@ export async function GET(req: Request) {
 
     const activeEvents = combinedObjectsArray
       .filter((event: { start: string; end: string }) => {
-        const eventStartDate = moment.tz(event.start)
-        const eventEndDate = moment.tz(event.end)
+        const eventStartDate = new Date(event.start)
+        const eventEndDate = new Date(event.end)
 
         // Check if the current date is within the event's start and end dates
-        return currentDate >= eventStartDate && currentDate <= eventEndDate
+        return currentDate.isSameOrAfter(eventStartDate) && currentDate.isSameOrBefore(eventEndDate)
       })
       .sort(
         (a: { end: any }, b: { end: any }) =>
@@ -79,10 +79,10 @@ export async function GET(req: Request) {
 
     const upcomingEvents = combinedObjectsArray
       .filter((event: { start: string }) => {
-        const eventStartDate = moment.tz(event.start)
+        const eventStartDate = new Date(event.start)
 
         // Check if the current date is before the event's start date
-        return currentDate < eventStartDate
+        return currentDate.isSameOrBefore(eventStartDate)
       })
       .sort(
         (a: { start: any }, b: { start: any }) =>
