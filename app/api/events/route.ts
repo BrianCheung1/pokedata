@@ -15,7 +15,7 @@ export async function GET(req: Request) {
       axios.get(leekData),
     ])
     const userTimezone = req.url.split("=").pop() as string
-    const currentDate = moment.tz(new Date(), userTimezone);
+    const currentDate = moment.tz(new Date().toLocaleString(),userTimezone);
   
     // Function to convert date strings to Date objects
     const parseDate = (dateString: string) => {
