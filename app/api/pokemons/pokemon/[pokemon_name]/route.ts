@@ -173,8 +173,28 @@ async function getCurrentMoves(pokemonName: string) {
   const response = await axios.get(`${POGOAPI}/current_pokemon_moves.json? `)
   const pokemonDetails = await getPokemonDetails(pokemonName)
   const pokemonTypes = await getPokemonTypes(pokemonName)
-  const pokemonMoves = response.data.find(
-    (pokemon: { pokemon_id: number }) =>
+
+  const normalForms = response.data.filter(
+    (pokemon: { form: string }) => pokemon.form === "Normal"
+  )
+  const uniquePokemonIds = new Set()
+
+  const filteredPokemon = response.data.filter(
+    (pokemon: { pokemon_id: number; form: string }) => {
+      const hasNormalForm = normalForms.find(
+        (normalPokemon: { pokemon_id: number }) =>
+          normalPokemon.pokemon_id === pokemon.pokemon_id
+      )
+      if (hasNormalForm) {
+        return pokemon.form === "Normal"
+      } else {
+        return pokemon
+      }
+    }
+  )
+
+  const pokemonMoves = filteredPokemon.find(
+    (pokemon: { pokemon_id: number; form: string }) =>
       pokemon.pokemon_id === pokemonDetails.id
   )
   if (pokemonMoves.cached) return pokemonMoves
