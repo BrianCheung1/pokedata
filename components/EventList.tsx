@@ -182,7 +182,7 @@ export const EventList = () => {
 
   return (
     <>
-      <Title>Active Events {data?.time}</Title>
+      <Title>Active Events {data?.time} {data?.timeZone}</Title>
       <Accordion> {renderActiveEvents} </Accordion>
       <Title>Upcoming Events</Title>
       <Accordion>{renderUpcomingEvents}</Accordion>
