@@ -12,6 +12,7 @@ import { useEffect, useState } from "react"
 
 export const EventList = () => {
   const userTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone
+  
   const { data, isLoading } = useEvents(userTimezone)
 
   const [currentTime, setCurrentTime] = useState(new Date())
@@ -182,7 +183,7 @@ export const EventList = () => {
 
   return (
     <>
-      <Title>Active Events {data?.time} {data?.timeZone}</Title>
+      <Title>Active Events {data?.time} {data?.timeZone} {userTimezone}</Title>
       <Accordion> {renderActiveEvents} </Accordion>
       <Title>Upcoming Events</Title>
       <Accordion>{renderUpcomingEvents}</Accordion>

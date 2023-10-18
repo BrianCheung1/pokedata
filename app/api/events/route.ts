@@ -9,14 +9,13 @@ const leekData =
   "https://raw.githubusercontent.com/bigfoott/ScrapedDuck/data/events.json"
 export async function GET(req: Request) {
   try {
-
     const [events, leekEvents] = await Promise.all([
       axios.get(eventsData),
       axios.get(leekData),
     ])
     const userTimezone = req.url.split("=").pop() as string
-    const currentDate = moment.tz(new Date().toLocaleString(),userTimezone);
-  
+    const currentDate = moment.tz(userTimezone)
+
     // Function to convert date strings to Date objects
     const parseDate = (dateString: string) => {
       const date = new Date(dateString)
@@ -70,7 +69,10 @@ export async function GET(req: Request) {
         const eventEndDate = new Date(event.end)
 
         // Check if the current date is within the event's start and end dates
-        return currentDate.isSameOrAfter(eventStartDate) && currentDate.isSameOrBefore(eventEndDate)
+        return (
+          currentDate.isSameOrAfter(eventStartDate) &&
+          currentDate.isSameOrBefore(eventEndDate)
+        )
       })
       .sort(
         (a: { end: any }, b: { end: any }) =>
@@ -93,6 +95,7 @@ export async function GET(req: Request) {
       {
         msg: "Success",
         time: currentDate,
+        timeformatted: currentDate.format(),
         timeZone: userTimezone,
         active_events: activeEvents,
         upcoming_events: upcomingEvents,
