@@ -1,8 +1,6 @@
-
-import { Container, Flex, Title } from "@mantine/core"
+import { Container, Flex, Title, Text } from "@mantine/core"
 import { SearchBar } from "@/components/SearchBar"
 import { NavBar } from "@/components/NavBar"
-import { EventList } from "@/components/EventList"
 
 export default function Home() {
   return (
@@ -14,7 +12,15 @@ export default function Home() {
         align="center"
         direction="column"
       >
-        <Title order={1}>PokeData</Title>
+        <Text
+          size="calc(5rem * var(--mantine-scale))"
+          fw={900}
+          variant="gradient"
+          gradient={{ from: "blue", to: "green", deg: 90 }}
+        >
+          PokeData
+        </Text>
+
         <SearchBar />
       </Flex>
     </Container>

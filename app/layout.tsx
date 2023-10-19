@@ -5,7 +5,16 @@ import "@mantine/core/styles.css"
 
 export const metadata: Metadata = {
   title: "PokeData",
-  description: "Pokemon Go Data",
+  description: "Pokemon Go Database",
+  openGraph: {
+    title: "PokeData",
+    description: "Pokemon Go Database",
+    images: "/images/pokemon-go-logo.png",
+    url: "https://pokedata-rose.vercel.app/",
+    siteName: "PokeData",
+    locale: "en_US",
+    type: "website",
+  },
 }
 
 export default function RootLayout({ children }: { children: any }) {

@@ -20,6 +20,16 @@ export const TeamRocketGrunts = () => {
   const { data, isLoading } = useGrunts()
   const router = useRouter()
 
+  // Get an array of color keys
+  const colorKeys = Object.keys(colors)
+
+  // Generate a random index within the range of colorKeys
+  const randomIndex = Math.floor(Math.random() * colorKeys.length)
+
+  // Use the random key to access a color from the dictionary
+  const randomColorKey = colorKeys[randomIndex]
+  const randomColor = colors[randomColorKey]
+
   const renderGrunts = (grunt: {
     name: string
     team: any[]
@@ -29,10 +39,12 @@ export const TeamRocketGrunts = () => {
     <Grid.Col key={grunt.name} span={{ base: 12, md: 6, xl: 4 }}>
       <Card
         bg={darken(
-          grunt.type ? colors[grunt.type.toLowerCase()] : "yellow",
+          grunt.type ? colors[grunt.type.toLowerCase()] : randomColor,
           0.7
         )}
+        radius="md"
         withBorder
+        h={750}
       >
         <Text>
           {grunt.name
@@ -63,9 +75,7 @@ export const TeamRocketGrunts = () => {
                   <Stack key={pokemon.name}>
                     <Image
                       src={pokemon.sprite}
-                      // h={200}
                       h={100}
-                      // w="auto"
                       fit="contain"
                       alt="Pokemon"
                       fallbackSrc="/images/default-pokemon.jpg"
