@@ -67,11 +67,11 @@ export const EventList = () => {
     const label = currentTime < startTime ? "Starts in" : "Ends in"
 
     return (
-      <div className="ml-auto mr-5 flex flex-col items-center justify-center">
+      <div className="ml-auto flex flex-col items-center justify-center w-36">
         <Text size="sm" c="dimmed">
           {label}
         </Text>
-        <Text size="sm" c="dimmed">
+        <Text size="sm" c="dimmed" >
           {formatTime(days, hours, minutes)}
         </Text>
       </div>
@@ -88,8 +88,10 @@ export const EventList = () => {
     <Accordion.Item key={event.name} value={event.name}>
       <Accordion.Control>
         <Group wrap="nowrap">
-          <div>
+          <div className="w-full">
+            <Text>
             {event.name}
+            </Text>
             <Text size="sm" c="dimmed">
               End Date: {formatDate(event.end)}
             </Text>
@@ -184,9 +186,7 @@ export const EventList = () => {
   return (
     <>
       <Title>Active Events</Title>
-      <Text>{data?.time}</Text>
-      <Text>{data?.timeZone}</Text>
-      <Text>{userTimezone}</Text>
+      <Text size="sm" c="dimmed">Time Now: {formatDate(data?.time)}</Text>
       <Accordion> {renderActiveEvents} </Accordion>
       <Title>Upcoming Events</Title>
       <Accordion>{renderUpcomingEvents}</Accordion>
