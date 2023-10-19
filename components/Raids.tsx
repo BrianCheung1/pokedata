@@ -24,8 +24,8 @@ export const Raids = () => {
     <Image src="/images/raid_icon.webp" alt="raid" h={50} w={50} />
   )
 
-  const RenderRaidGroup = (count: any) => (
-    <Group gap="xs">
+  const RenderRaidGroup = ({ count }: { count: number }) => (
+    <Group gap="xs" className="mb-1">
       {[...Array(count)].map((_, index) => (
         <RenderRaidIcon key={index} />
       ))}
@@ -101,7 +101,7 @@ export const Raids = () => {
       <Grid className="mb-5"> {renderTier4Raids} </Grid>
       {renderTier5Raids.length > 0 && <RenderRaidGroup count={5} />}
       <Grid className="mb-5"> {renderTier5Raids} </Grid>
-      <Text>Mega Raids</Text>
+      <Image src="/images/mega_raid_icon.png" alt="mega" h={50} w={50} className="mb-1"/>
       <Grid className="mb-5"> {renderTierMegaRaids} </Grid>
     </>
   )

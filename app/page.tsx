@@ -1,7 +1,8 @@
-import { ColorSchemeToggle } from "@/components/ColorSchemeToggle"
+
 import { Container, Flex, Title } from "@mantine/core"
 import { SearchBar } from "@/components/SearchBar"
 import { NavBar } from "@/components/NavBar"
+import { EventList } from "@/components/EventList"
 
 export default function Home() {
   return (

@@ -1,55 +1,45 @@
 import axios, { AxiosResponse } from "axios"
 import { NextResponse } from "next/server"
+import gruntsData from "@/libs/grunts.json"
 
 const POKEAPI = "https://pokeapi.co/api/v2"
 
-interface Grunt {
-  active: boolean
-  character: {
-    template: string
-    type: { name: string }
-  }
-  lineup: {
-    team: { id: string }[][]
-  }
-}
-
-interface PokemonDetail {
-  name: string
-  sprite: string
-}
-
 export async function GET(req: Request) {
   try {
-    const gruntsResponse: AxiosResponse<Record<string, Grunt>> =
-      await axios.get(
-        "https://raw.githubusercontent.com/ccev/pogoinfo/v2/active/grunts.json"
-      )
-
-    const gruntsActive: Grunt[] = Object.values(gruntsResponse.data).filter(
-      (grunt) => grunt.active
+    // const gruntsResponse: AxiosResponse<Record<string, Grunt>> =
+    //   await axios.get(
+    //     "https://raw.githubusercontent.com/ccev/pogoinfo/v2/active/grunts.json"
+    //   )
+    const gruntsResponse = gruntsData
+    const gruntsActive = Object.values(gruntsResponse).filter(
+      (grunt) => grunt.active && !grunt.character.boss
     )
 
-    const gruntLineUpDetails = await Promise.all(
-      gruntsActive.map(async (grunt) => {
-        const gruntTeams = grunt.lineup.team.map((team) =>
-          team.map((pokemon) => pokemon.id)
-        )
-
-        const pokemonDetails = await getPokemonDetails(gruntTeams)
-
-        return {
-          name: grunt.character.template,
-          team: pokemonDetails,
-          type: grunt.character.type.name,
-        }
-      })
+    const executiveActive = Object.values(gruntsResponse).filter(
+      (grunt) => grunt.active && grunt.character.boss
     )
+    
+    const executiveSorted = executiveActive.sort((a, b) => {
+      // Custom sorting logic
+      if (a.character.template === "CHARACTER_GIOVANNI") {
+        return -1; // "CHARACTER_GIOVANNI" comes first
+      } else {
+        // For other characters, use the default sorting order
+        return a.character.template.localeCompare(b.character.template);
+      }
+    });
+
+    // Usage
+    const [gruntLineUpDetails, executiveLineUpDetails] = await Promise.all([
+      getLineUpDetails(gruntsActive),
+      getLineUpDetails(executiveSorted),
+    ])
 
     return NextResponse.json(
       {
         msg: "Success",
         grunts: gruntLineUpDetails,
+        executive: executiveLineUpDetails,
       },
       { status: 200 }
     )
@@ -58,9 +48,7 @@ export async function GET(req: Request) {
   }
 }
 
-async function getPokemonDetails(
-  pokemonTeams: string[][]
-): Promise<PokemonDetail[][]> {
+async function getPokemonDetails(pokemonTeams: string[][]) {
   const flattenTeams: string[] = pokemonTeams.flat() // Flatten the nested array
 
   try {
@@ -78,12 +66,29 @@ async function getPokemonDetails(
     )
 
     // Rearrange the results back into the original structure
-    return pokemonTeams.map((team) =>
-      team.map(() => pokemonDetails.shift() as PokemonDetail)
-    )
+    return pokemonTeams.map((team) => team.map(() => pokemonDetails.shift()))
   } catch (error) {
     console.error("Error fetching Pokémon details:", error)
     // Handle error, you may return an empty array or some default data
     return []
   }
+}
+
+async function getLineUpDetails(gruntList: any) {
+  return await Promise.all(
+    gruntList.map(async (grunt: any) => {
+      const gruntTeams = grunt.lineup.team.map((team: any) =>
+        team.map((pokemon: { id: string }) => pokemon.id)
+      )
+
+      const pokemonDetails = await getPokemonDetails(gruntTeams)
+
+      return {
+        name: grunt.character.template,
+        team: pokemonDetails,
+        type: grunt.character.type.name,
+        quotes: grunt.character.quotes,
+      }
+    })
+  )
 }
