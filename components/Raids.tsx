@@ -24,7 +24,7 @@ export const Raids = () => {
     <Image src="/images/raid_icon.webp" alt="raid" h={50} w={50} />
   )
 
-  const RenderRaidGroup = (raid: any, count: number) => (
+  const RenderRaidGroup = (count: any) => (
     <Group gap="xs">
       {[...Array(count)].map((_, index) => (
         <RenderRaidIcon key={index} />
