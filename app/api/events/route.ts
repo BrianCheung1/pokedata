@@ -13,7 +13,7 @@ export async function GET(req: Request) {
       axios.get(eventsData),
       axios.get(leekData),
     ])
-    const userTimezone = decodeURIComponent( req.url).split("=").pop() as string
+    const userTimezone = decodeURIComponent(req.url).split("=").pop() as string
     const currentDate = moment.tz(userTimezone)
 
     // Function to convert date strings to Date objects
@@ -33,8 +33,13 @@ export async function GET(req: Request) {
       ).toISOString()}-${obj.name}`
 
     // Function to combine objects
-    const combineObjects = (obj1: any, obj2: { extraData: any }) => ({
+    const combineObjects = (
+      obj1: any,
+      obj2: { extraData: any; image: string; link: string }
+    ) => ({
       ...obj1,
+      image: obj2.image,
+      link: obj2.link,
       extraData: {
         ...obj2.extraData,
       },

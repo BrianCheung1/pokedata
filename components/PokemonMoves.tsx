@@ -35,8 +35,8 @@ const renderMoves = (moves?: Move[], charged?: boolean) => {
       <Table.Td>{move.dps}</Table.Td>
       <Table.Td>{move.dpe}</Table.Td>
       <Table.Td>{move.eps}</Table.Td>
-      <Table.Td>{charged ? "N/A": move.dps_eps}</Table.Td>
-      <Table.Td>{charged ? move.dps_dpe: "N/A"}</Table.Td>
+      <Table.Td>{charged ? "N/A" : move.dps_eps}</Table.Td>
+      <Table.Td>{charged ? move.dps_dpe : "N/A"}</Table.Td>
       <Table.Td>{move.type}</Table.Td>
     </Table.Tr>
   ))
@@ -45,7 +45,7 @@ const renderMoves = (moves?: Move[], charged?: boolean) => {
 export const PokemonMoves: React.FC<PokemonMovesProps> = ({
   pokemon: { moves },
 }) => (
-  <Table.ScrollContainer minWidth={500}>
+  <Table.ScrollContainer minWidth={100}>
     <Table horizontalSpacing="md" captionSide="bottom" highlightOnHover>
       <Table.Caption>Highlighted Rows are the best moves </Table.Caption>
       <Table.Caption>

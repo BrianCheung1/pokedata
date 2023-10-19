@@ -1,16 +1,6 @@
-import {
-  Text,
-  Image,
-  Group,
-  Stack,
-  Affix,
-  Transition,
-  Button,
-  rem,
-} from "@mantine/core"
+import { Text, Image, Group, Stack } from "@mantine/core"
 import { capitalize } from "@/libs/utils"
 import { useRouter } from "next/navigation"
-import { IconArrowUp } from "@tabler/icons-react"
 import { useWindowScroll } from "@mantine/hooks"
 import { useState } from "react"
 
@@ -43,7 +33,6 @@ export const PokemonEvolutions: React.FC<PokemonEvolutionsProps> = ({
   pokemon: { pokemon_name, evolution_family },
 }) => {
   const router = useRouter()
-  const [scroll, scrollTo] = useWindowScroll()
   const renderEvolutions = () => {
     if (!evolution_family || evolution_family.length === 0) {
       return null // Return null if no evolutions are present
@@ -83,7 +72,7 @@ export const PokemonEvolutions: React.FC<PokemonEvolutionsProps> = ({
           {element.other_forms.map((form) => {
             return (
               <>
-              {console.log(form)}
+                {console.log(form)}
                 <ImageWithHideOnError
                   src={form.sprite}
                   fit="contain"
@@ -112,21 +101,6 @@ export const PokemonEvolutions: React.FC<PokemonEvolutionsProps> = ({
 
   return (
     <>
-      <Affix position={{ bottom: 20, right: 20 }}>
-        <Transition transition="slide-up" mounted={scroll.y > 0}>
-          {(transitionStyles) => (
-            <Button
-              leftSection={
-                <IconArrowUp style={{ width: rem(16), height: rem(16) }} />
-              }
-              style={transitionStyles}
-              onClick={() => scrollTo({ y: 0 })}
-            >
-              Scroll to top
-            </Button>
-          )}
-        </Transition>
-      </Affix>
       <Group justify="space-around" align="left">
         {renderEvolutions()}
       </Group>

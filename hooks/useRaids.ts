@@ -1,8 +1,8 @@
 import useSwr from "swr"
 import fetcher from "@/libs/fetcher"
 
-const useGrunts = () => {
-  const { data, error, isLoading } = useSwr(`/api/grunts`, fetcher, {
+const useRaids = () => {
+  const { data, error, isLoading } = useSwr(`/api/raids`, fetcher, {
     revalidateIfStale: false,
     revalidateOnFocus: false,
     revalidateOnReconnect: false,
@@ -15,4 +15,4 @@ const useGrunts = () => {
   }
 }
 
-export default useGrunts
+export default useRaids

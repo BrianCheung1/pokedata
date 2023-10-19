@@ -9,21 +9,15 @@ import {
   darken,
   Image,
   Title,
-  Affix,
-  Button,
-  Transition,
-  rem,
   Skeleton,
 } from "@mantine/core"
 import { colors } from "@/libs/utils"
 import { capitalize } from "@/libs/utils"
-import { IconArrowUp } from "@tabler/icons-react"
 import { useRouter } from "next/navigation"
-import { useWindowScroll } from "@mantine/hooks"
+import { ScrollUp } from "./ScrollUp"
 
 export const TeamRocketGrunts = () => {
   const { data, isLoading } = useGrunts()
-  const [scroll, scrollTo] = useWindowScroll()
   const router = useRouter()
 
   const renderGrunts = data?.grunts?.map(
@@ -93,21 +87,7 @@ export const TeamRocketGrunts = () => {
 
   return (
     <Grid justify="center" align="stretch">
-      <Affix position={{ bottom: 20, right: 20 }}>
-        <Transition transition="slide-up" mounted={scroll.y > 0}>
-          {(transitionStyles) => (
-            <Button
-              leftSection={
-                <IconArrowUp style={{ width: rem(16), height: rem(16) }} />
-              }
-              style={transitionStyles}
-              onClick={() => scrollTo({ y: 0 })}
-            >
-              Scroll to top
-            </Button>
-          )}
-        </Transition>
-      </Affix>
+      <ScrollUp />
 
       {renderGrunts}
     </Grid>
