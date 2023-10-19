@@ -29,9 +29,12 @@ export const EventList = () => {
     return () => clearInterval(intervalId)
   }, []) // The empty dependency array ensures that the effect runs only once on mount
 
-  const formatDate = (date: string) => {
-    const newDate = new Date(date)
-    const formattedDate = newDate
+  const formatDate = (startDate: string, endDate: string) => {
+    const startTime = new Date(startDate)
+    const endTime = new Date(endDate)
+    const currentTime = new Date()
+
+    const formattedStartDate = startTime
       .toLocaleString("en-US", {
         weekday: "short",
         year: "numeric",
@@ -43,7 +46,23 @@ export const EventList = () => {
       })
       .replace(/,/g, "")
 
-    return formattedDate
+    const formattedEndDate = endTime
+      .toLocaleString("en-US", {
+        weekday: "short",
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+        hour: "2-digit",
+        minute: "2-digit",
+        hour12: true,
+      })
+      .replace(/,/g, "")
+
+    const label = currentTime < startTime ? "Starts Date:" : "Ends Date:"
+
+    return currentTime < startTime
+      ? `${label} ${formattedStartDate}`
+      : `${label} ${formattedEndDate}`
   }
 
   const formatTime = (days: number, hours: number, minutes: number) => {
@@ -96,7 +115,7 @@ export const EventList = () => {
           <div className="w-full">
             <Text>{event.name}</Text>
             <Text size="sm" c="dimmed">
-              End Date: {formatDate(event.end)}
+              {formatDate(event.start, event.end)}
             </Text>
           </div>
           {eventEnds(event.start, event.end)}
@@ -105,7 +124,6 @@ export const EventList = () => {
       <Accordion.Panel>
         <Card bg="none">
           <div>
-            {event.bonuses?.length > 0 && `Bonuses:`}
             {event.bonuses?.map((bonus) => (
               <Text key={bonus.text} size="sm" c="dimmed">
                 {bonus.text}
@@ -122,7 +140,7 @@ export const EventList = () => {
                       src={boss.image}
                       alt="boss"
                       fit="contain"
-                      h={100}
+                      h={200}
                       w="auto"
                     />
                     {event.extraData?.raidbattles?.shinies?.[index] && (
@@ -130,7 +148,7 @@ export const EventList = () => {
                         src={event.extraData.raidbattles.shinies[index].image}
                         alt={`shiny-${index}`}
                         fit="contain"
-                        h={100}
+                        h={200}
                         w="auto"
                       />
                     )}
@@ -142,46 +160,54 @@ export const EventList = () => {
               )
             )}
             {event.extraData?.spotlight && (
-              <div key={event.extraData.spotlight.name}>
-                <Text size="sm" c="dimmed">
-                  {event.extraData.spotlight.name}
-                </Text>
-                <Text size="sm" c="dimmed">
-                  {event.extraData.spotlight.bonus}
-                </Text>
+              <Group key={event.extraData.spotlight.name}>
+                <Stack>
+                  <Text size="sm" c="dimmed">
+                    {event.extraData.spotlight.name}
+                  </Text>
+                  <Text size="sm" c="dimmed">
+                    {event.extraData.spotlight.bonus}
+                  </Text>
+                </Stack>
                 <Image
                   src={event.extraData.spotlight.image}
                   alt="spotlight"
                   fit="contain"
-                  h={100}
+                  h={200}
                   w="auto"
                 />
-              </div>
+              </Group>
             )}
             {event.extraData?.communityday && (
               <>
-                {event.extraData.communityday.spawns?.map(
-                  (spawn: { name: string; image: string }) => (
-                    <div key={spawn.image}>
-                      <Image
-                        src={spawn.image}
-                        alt="pokemon"
-                        fit="contain"
-                        h={100}
-                        w="auto"
-                      />
-                      <Text key={spawn.name} size="sm" c="dimmed">
-                        {spawn.name}
-                      </Text>
-                    </div>
-                  )
-                )}
+                <Group align="center" justify="center">
+                  {event.extraData.communityday.spawns?.map(
+                    (spawn: { name: string; image: string }) => (
+                      <div key={spawn.image}>
+                        <Image
+                          src={spawn.image}
+                          alt="pokemon"
+                          fit="contain"
+                          h={200}
+                          w="auto"
+                        />
+                        <Text
+                          key={spawn.name}
+                          size="sm"
+                          c="dimmed"
+                          className="text-center"
+                        >
+                          {spawn.name}
+                        </Text>
+                      </div>
+                    )
+                  )}
+                </Group>
                 <Text size="sm" c="dimmed">
                   {event.extraData.communityday.bonusDisclaimers}
                 </Text>
               </>
             )}
-
             <Button
               component="a"
               href={event.link}
@@ -208,7 +234,17 @@ export const EventList = () => {
       <ScrollUp />
       <Title>Active Events</Title>
       <Text size="sm" c="dimmed">
-        Time Now: {formatDate(data?.time)}
+        {new Date(data?.time)
+          ?.toLocaleString("en-US", {
+            weekday: "short",
+            year: "numeric",
+            month: "2-digit",
+            day: "2-digit",
+            hour: "2-digit",
+            minute: "2-digit",
+            hour12: true,
+          })
+          .replace(/,/g, "")}
       </Text>
       <Accordion> {renderActiveEvents} </Accordion>
       <Title>Upcoming Events</Title>
