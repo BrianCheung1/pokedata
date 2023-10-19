@@ -2,11 +2,9 @@ import {
   Card,
   Text,
   Group,
-  Accordion,
   Title,
   Skeleton,
   Image,
-  Stack,
   Grid,
   Badge,
   darken,
@@ -38,7 +36,7 @@ export const Raids = () => {
   }
 
   const renderRaids = (raid: { name: string; types: any; image: string }) => (
-    <Grid.Col key={raid.name} span={{ base: 12, md: 6, lg: 4 }}>
+    <Grid.Col key={raid.name} span="auto">
       <Card
         shadow="sm"
         padding="lg"
@@ -46,6 +44,7 @@ export const Raids = () => {
         withBorder
         className="mb-2"
         bg={darken(colors[raid.types[0].name], 0.7)}
+        h={300}
       >
         <div className="flex justify-center">
           <Image
@@ -101,7 +100,13 @@ export const Raids = () => {
       <Grid className="mb-5"> {renderTier4Raids} </Grid>
       {renderTier5Raids.length > 0 && <RenderRaidGroup count={5} />}
       <Grid className="mb-5"> {renderTier5Raids} </Grid>
-      <Image src="/images/mega_raid_icon.png" alt="mega" h={50} w={50} className="mb-1"/>
+      <Image
+        src="/images/mega_raid_icon.png"
+        alt="mega"
+        h={50}
+        w={50}
+        className="mb-1"
+      />
       <Grid className="mb-5"> {renderTierMegaRaids} </Grid>
     </>
   )

@@ -177,7 +177,6 @@ async function getCurrentMoves(pokemonName: string) {
   const normalForms = response.data.filter(
     (pokemon: { form: string }) => pokemon.form === "Normal"
   )
-  const uniquePokemonIds = new Set()
 
   const filteredPokemon = response.data.filter(
     (pokemon: { pokemon_id: number; form: string }) => {
@@ -516,7 +515,6 @@ async function findCPRange(pokemon_name: string) {
       )}`,
     }))
 
-    console.log(data.length)
     return data
   } catch (error) {
     return NextResponse.json(
