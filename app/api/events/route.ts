@@ -7,6 +7,9 @@ const eventsData =
 
 const leekData =
   "https://raw.githubusercontent.com/bigfoott/ScrapedDuck/data/events.json"
+
+//Returns list of events filtered into active and upcoming events
+//Timezone will be based on the person accessing it
 export async function GET(req: Request) {
   try {
     const [events, leekEvents] = await Promise.all([
@@ -45,6 +48,8 @@ export async function GET(req: Request) {
       },
     })
 
+    //mapping through both datasets to see what matches depending on start and end time
+    //if they have the same start and end time keys, leekEvents extradata will be added to map
     events.data.forEach((obj: any) => {
       const key = createKey(obj)
       if (combinedObjectsMap.has(key)) {
@@ -68,6 +73,7 @@ export async function GET(req: Request) {
     // Convert the map values back to an array
     const combinedObjectsArray = Array.from(combinedObjectsMap.values())
 
+    //Filter events by active and upcoming
     const activeEvents = combinedObjectsArray
       .filter((event: { start: string; end: string }) => {
         const eventStartDate = new Date(event.start)

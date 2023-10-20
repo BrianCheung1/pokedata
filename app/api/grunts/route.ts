@@ -4,32 +4,29 @@ import gruntsData from "@/libs/grunts.json"
 
 const POKEAPI = "https://pokeapi.co/api/v2"
 
+//returns a list of team rocket names and lineups
+//filter for regular grunts and leaders
 export async function GET(req: Request) {
   try {
-    // const gruntsResponse: AxiosResponse<Record<string, Grunt>> =
-    //   await axios.get(
-    //     "https://raw.githubusercontent.com/ccev/pogoinfo/v2/active/grunts.json"
-    //   )
     const gruntsResponse = gruntsData
+    //filter for grunts
     const gruntsActive = Object.values(gruntsResponse).filter(
       (grunt) => grunt.active && !grunt.character.boss
     )
-
+    //filter for leaders
     const executiveActive = Object.values(gruntsResponse).filter(
       (grunt) => grunt.active && grunt.character.boss
     )
-    
+
     const executiveSorted = executiveActive.sort((a, b) => {
       // Custom sorting logic
       if (a.character.template === "CHARACTER_GIOVANNI") {
-        return -1; // "CHARACTER_GIOVANNI" comes first
+        return -1 // "CHARACTER_GIOVANNI" comes first
       } else {
         // For other characters, use the default sorting order
-        return a.character.template.localeCompare(b.character.template);
+        return a.character.template.localeCompare(b.character.template)
       }
-    });
-
-    // Usage
+    })
     const [gruntLineUpDetails, executiveLineUpDetails] = await Promise.all([
       getLineUpDetails(gruntsActive),
       getLineUpDetails(executiveSorted),

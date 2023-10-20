@@ -1,6 +1,9 @@
 import axios from "axios"
 import { NextResponse } from "next/server"
 
+
+//returns a list of released pokemons in pokemon go
+//filters by normal type as there are multiple forms
 export async function GET(req: Request) {
   try {
     const [pokemons, released_pokemons] = await Promise.all([

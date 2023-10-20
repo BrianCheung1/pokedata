@@ -1,5 +1,5 @@
 import React from "react";
-import { Text, Title } from "@mantine/core";
+import { Text, Title, Checkbox,Group } from "@mantine/core";
 
 interface ShinyData {
   found_egg?: boolean;
@@ -17,9 +17,9 @@ export const PokemonShiny: React.FC<PokemonShinyProps> = ({
   pokemon: { shiny = {} },
 }) => {
   const renderShinyInfo = (label: string, value?: boolean) => (
-    <Text size="md" c="dimmed">
-      {label}: {value ? "True" : "N/A"}
-    </Text>
+    <Group>
+      {label}: {value ? <Checkbox checked /> : <Checkbox indeterminate />}
+    </Group>
   );
 
   return (

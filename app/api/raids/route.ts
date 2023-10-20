@@ -3,6 +3,9 @@ import { NextResponse } from "next/server"
 
 const leekData =
   "https://raw.githubusercontent.com/bigfoott/ScrapedDuck/data/raids.json"
+
+//returns a list of raids based on tier types
+//currently missing shadow raids as they are not included in api
 export async function GET(req: Request) {
   try {
     const leekRaids = await axios.get(leekData)

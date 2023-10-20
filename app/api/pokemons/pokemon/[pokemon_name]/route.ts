@@ -8,6 +8,9 @@ const POKEAPI = "https://pokeapi.co/api/v2"
 //default cache time 5mins
 const axios = setupCache(Axios)
 
+
+//returns a list of pokemon details
+//name, type, id, movesets, etc
 export async function GET(
   req: Request,
   { params }: { params: { pokemon_name: string } }
@@ -111,6 +114,8 @@ async function getChargedMove(moveName: string) {
   return response.data.find((move: { name: string }) => move.name === moveName)
 }
 
+//loops through the evolution chain of the pokemon in order to
+//get all pokemon and forms of a certain pokemon
 async function getEvolutions(pokemonName: string) {
   const speciesResponse = await axios.get(
     `${POKEAPI}/pokemon-species/${pokemonName}`
@@ -157,6 +162,8 @@ async function getEvolutions(pokemonName: string) {
     } catch (error) {
       console.log(`Error with Pokemon name ${currentSpecies.name}`)
     }
+
+    //goes through the evoltuion multiple times as long as there is a chain to continue
     await Promise.all(
       (chain.evolves_to || []).map(async (evolution: any) =>
         traverseChain(evolution)
@@ -169,6 +176,11 @@ async function getEvolutions(pokemonName: string) {
   return evolutions_family
 }
 
+
+//filters through the current moves of a pokemon
+//returns back a list of pokemon moves along side their stats
+//dps, dpe, eps, etc
+//filters for normal pokemon forms only as there are multiple forms
 async function getCurrentMoves(pokemonName: string) {
   const response = await axios.get(`${POGOAPI}/current_pokemon_moves.json? `)
   const pokemonDetails = await getPokemonDetails(pokemonName)
@@ -290,6 +302,8 @@ async function getShiny(pokemon_name: string) {
   return response.data[Number(pokemon_details.id)]
 }
 
+//filters through pokemons and returns the first matching id as
+//there are multiple forms
 async function getPokemonStats(pokemon_name: string) {
   const pokemon_details = await getPokemonDetails(pokemon_name)
   const [statsResponse, maxCPResponse] = await Promise.all([
@@ -315,6 +329,8 @@ async function getCPMultiplier() {
   return response.data
 }
 
+//filters through pokemons with matching id
+//as there are multiple forms
 async function findPokemonBuddy(pokemon_name: string) {
   try {
     const pokemon_details = await getPokemonDetails(pokemon_name)
@@ -330,6 +346,8 @@ async function findPokemonBuddy(pokemon_name: string) {
   }
 }
 
+//filters through the different weathers and finds
+//the corresponding weather to the pokemon
 async function findPokemonBoosted(pokemonName: string) {
   try {
     const response = await axios.get(`${POGOAPI}/weather_boosts.json`)
@@ -349,9 +367,13 @@ async function findPokemonBoosted(pokemonName: string) {
   }
 }
 
+//returns a list of types that the pokemon
+//is vulnerable and resistant against
 async function findTypeAdvantages(pokemonName: string) {
   try {
     const pokemonTypes = await getPokemonTypes(pokemonName)
+
+    //getting types that the pokemon does more dmg, less dmg, and no dmg to
     const doubleDmgFromPromise = async (type: string) => {
       const doubleDamageFrom = await getTypeDoubleDmgFrom(type)
       return doubleDamageFrom
@@ -371,6 +393,8 @@ async function findTypeAdvantages(pokemonName: string) {
       Promise.all(pokemonTypes.map(noDmgFromPromise)),
     ])
 
+    //multipling the dmgs together if there are duplicates as 
+    //dual type pokemons can up to 2.56x extra dmg if both types are weak
     const double_dmg_from = double_dmg.flat().reduce((acc, obj) => {
       const key = Object.keys(obj)[0]
       const existingObj = acc.find((item: {}) => Object.keys(item)[0] === key)
@@ -380,6 +404,7 @@ async function findTypeAdvantages(pokemonName: string) {
       return acc
     }, [])
 
+    //dual type pokemons can take  0.390625x dmg if both types are resistant
     const half_dmg_from = half_dmg.flat().reduce((acc, obj) => {
       const key = Object.keys(obj)[0]
       const existingObj = acc.find((item: {}) => Object.keys(item)[0] === key)
@@ -389,6 +414,7 @@ async function findTypeAdvantages(pokemonName: string) {
       return acc
     }, [])
 
+    //multipying by 100 to get full percentage
     const resultArray = [...double_dmg_from, ...half_dmg_from].reduce(
       (acc, obj) => {
         const key = Object.keys(obj)[0]
@@ -402,10 +428,14 @@ async function findTypeAdvantages(pokemonName: string) {
       },
       []
     )
+
+    //remove the vulnerable if its in the no dmg list
     const filteredArray = resultArray.filter((item: {}) => {
       const key = Object.keys(item)[0]
       return !no_dmg.flat().includes(key)
     })
+
+    //filter by percentages over and under 100
     const types = {
       vulnerable: filteredArray.filter(
         (obj: { [key: string]: number }) => Object.values(obj)[0] > 100
@@ -463,6 +493,9 @@ async function findEvolutionFamily(pokemonName: string) {
   }
 }
 
+//returns a list of cp ranges a pokemon can have depending
+//on its level
+//api does not have full levels so have to include additonal levels
 async function findCPRange(pokemon_name: string) {
   try {
     const [pokemonStats, CPMultiplier] = await Promise.all([

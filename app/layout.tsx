@@ -2,6 +2,8 @@ import "./globals.css"
 import type { Metadata } from "next"
 import { MantineProvider, ColorSchemeScript } from "@mantine/core"
 import "@mantine/core/styles.css"
+import { NavBar } from "@/components/NavBar"
+import { Info } from "@/components/Info"
 
 export const metadata: Metadata = {
   title: "PokeData",
@@ -25,7 +27,11 @@ export default function RootLayout({ children }: { children: any }) {
         <link rel="shortcut icon" href="/favicon.svg" />
       </head>
       <body>
-        <MantineProvider defaultColorScheme="dark">{children}</MantineProvider>
+        <MantineProvider defaultColorScheme="dark">
+          <NavBar />
+          {children}
+          <Info />
+        </MantineProvider>
       </body>
     </html>
   )

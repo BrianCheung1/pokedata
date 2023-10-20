@@ -70,7 +70,7 @@ export const NavBar = () => {
         <Burger
           onClick={open}
           aria-label="Toggle navigation"
-          className="absolute left-4 top-4"
+          className="fixed left-4 top-4"
         ></Burger>
       </Container>
     </>

@@ -1,13 +1,12 @@
 import { Container, Flex, Title, Text } from "@mantine/core"
 import { SearchBar } from "@/components/SearchBar"
-import { NavBar } from "@/components/NavBar"
+
 
 export default function Home() {
   return (
     <Container fluid>
-      <NavBar />
       <Flex
-        className="h-[calc(100vh-50px)] "
+        className="h-[calc(100vh-100px)] "
         justify="center"
         align="center"
         direction="column"
