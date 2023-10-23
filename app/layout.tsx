@@ -28,9 +28,8 @@ export default function RootLayout({ children }: { children: any }) {
       </head>
       <body>
         <MantineProvider defaultColorScheme="dark">
-          <NavBar />
           {children}
-          <Info />
+          {/* <Info/> */}
         </MantineProvider>
       </body>
     </html>

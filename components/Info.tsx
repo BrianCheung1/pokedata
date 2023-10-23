@@ -12,11 +12,5 @@ export const Info = () => {
       {item.title}
     </Anchor>
   ))
-  return (
-    <Container fluid className="mt-5">
-      <Flex justify="center">
-        <Breadcrumbs>{items}</Breadcrumbs>
-      </Flex>
-    </Container>
-  )
+  return <Breadcrumbs>{items}</Breadcrumbs>
 }

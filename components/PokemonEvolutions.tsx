@@ -1,4 +1,4 @@
-import { Text, Image, Group, Stack } from "@mantine/core"
+import { Text, Image, Group, Stack, Grid } from "@mantine/core"
 import { capitalize } from "@/libs/utils"
 import { useRouter } from "next/navigation"
 import { useWindowScroll } from "@mantine/hooks"
@@ -46,7 +46,7 @@ export const PokemonEvolutions: React.FC<PokemonEvolutionsProps> = ({
         sprite_shiny: string
         other_forms: any[]
       }) => (
-        <Stack key={element.sprite} align="center">
+        <Grid.Col key={element.sprite} span={4}>
           <Image
             src={element.sprite}
             fit="contain"
@@ -72,7 +72,6 @@ export const PokemonEvolutions: React.FC<PokemonEvolutionsProps> = ({
           {element.other_forms.map((form) => {
             return (
               <>
-                {console.log(form)}
                 <ImageWithHideOnError
                   src={form.sprite}
                   fit="contain"
@@ -94,16 +93,16 @@ export const PokemonEvolutions: React.FC<PokemonEvolutionsProps> = ({
               </>
             )
           })}
-        </Stack>
+        </Grid.Col>
       )
     )
   }
 
   return (
-    <>
-      <Group justify="space-around" align="left">
+
+      <Grid justify="space-around">
         {renderEvolutions()}
-      </Group>
-    </>
+      </Grid>
+
   )
 }

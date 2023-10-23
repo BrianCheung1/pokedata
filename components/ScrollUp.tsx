@@ -10,6 +10,7 @@ export const ScrollUp = () => {
       <Transition transition="slide-up" mounted={scroll.y > 0}>
         {(transitionStyles) => (
           <Button
+          size="xs"
             leftSection={
               <IconArrowUp style={{ width: rem(16), height: rem(16) }} />
             }
