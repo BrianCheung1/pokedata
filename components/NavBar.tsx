@@ -5,7 +5,7 @@ import {
   IconSearch,
   IconPokeball,
   IconCalendarEvent,
-  IconSwords
+  IconSwords,
 } from "@tabler/icons-react"
 import { useDisclosure } from "@mantine/hooks"
 import { ColorSchemeToggle } from "./ColorSchemeToggle"
@@ -57,12 +57,7 @@ export const NavBar = () => {
 
   return (
     <>
-      <Drawer
-        opened={opened}
-        onClose={close}
-        title="Menu"
-        size="xs"
-      >
+      <Drawer opened={opened} onClose={close} title="Menu" size="xs">
         <Box w={220}>{items}</Box>
         <ColorSchemeToggle />
       </Drawer>

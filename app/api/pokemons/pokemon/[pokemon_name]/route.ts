@@ -219,7 +219,7 @@ async function getCurrentMoves(pokemonName: string) {
         const dps = pokemonTypes.includes(moveDetails.type.toLowerCase())
           ? (moveDetails.power / moveDetails.duration) * 1.2 * 1000
           : (moveDetails.power / moveDetails.duration) * 1000
-        const dpe = Math.abs(moveDetails.power / moveDetails.energy_delta)
+        const dpe = pokemonTypes.includes(moveDetails.type.toLowerCase()) ? Math.abs(moveDetails.power / moveDetails.energy_delta) * 1.2 : Math.abs(moveDetails.power / moveDetails.energy_delta)
         const eps = (moveDetails.energy_delta / moveDetails.duration) * 1000
         return {
           name: moveDetails.name,
